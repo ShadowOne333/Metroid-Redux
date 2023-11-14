@@ -1,0 +1,10 @@
+#Ignore all ROM files
+out/*.nes
+out/*.nes.deb
+disassemblies/*.nes
+disassemblies/*.ips
+disassemblies/*.exe
+disassemblies/*.json
+rom/*.nes
+*.nes
+*.nes.deb
