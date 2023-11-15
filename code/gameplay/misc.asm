@@ -1,6 +1,6 @@
-;**************************************************************
-;	Miscellaneous changes and fixes
-;**************************************************************
+;-------------------------------------------------------------------
+;		Miscellaneous changes and fixes
+;-------------------------------------------------------------------
 
 ; Kraid Statue layout
 %org($8AA1,1)	; $04AB1
@@ -29,6 +29,8 @@
 	;db $F8,$00
 warnpc $8AE9
 
+;-------------------------------------
+
 %org($9012,1)	; $05022
 	db $0F,$20,$10,$00	; Change palette from Blue to Gray to statue area
 
@@ -36,6 +38,7 @@ warnpc $8AE9
 %org($A441,1)	; $06451
 	
 
+;-------------------------------------
 
 %org($B135,1)	; $07145
 ; Unused tile patterns, up to $B200
@@ -88,10 +91,11 @@ right_table:
 	db $40,$0F,$04,$00,$01,$FD,$20
 	db $4B,$4A,$49,$FD,$60,$22,$07
 	db $08,$32,$FF
+
 warnpc $B1F0
 
 
-;------------------------------------------------------------------
+;-------------------------------------
 
 ; Change attribute table for starting area. Changes tiles so certain tiles are gray, and the others remain blue instead of sharing the gray palette
 ; Morph Ball pedestal
@@ -101,8 +105,7 @@ warnpc $B1F0
 %org($88B3,8)	; $208C3
 	db $54
 
-;------------------------------------------------------------------
-
+;-------------------------------------
 ; Corner map position
 %org($99D1,14)	; $399E1
 	lda.b #$17	; Move corner map Y position
@@ -110,12 +113,14 @@ warnpc $B1F0
 	lda.b #$D0	; Move corner map X position
 
 
-;------------------------------------------------------------------
+;-------------------------------------
 
 ; Fix palette loading from Fast Doors
 %org($C92B,15)	; $3C93B
 	jsr $FFD5	; Originally JSR $E1F1, changed to new code for Fast Doors which fixes wrong palette loading
 
+;-------------------------------------
+; Change ending times to make it more forgiveable
 %org($CB18,15)	; $3CB28
 	db $7A	; 4th ending with 37+ hours
 	db $14	; 3rd ending with 6 hours
@@ -130,14 +135,28 @@ warnpc $B1F0
 
 %org($DC03,15)	; $3DC13
 	cmp #$07	; Change max tanks from $06 to $08 to accommodate for the extra 2 tanks you can get in the game
-; NOTE: THIS NEEDS A FIX SO THAT OBTAINING ALL 8 ENERGY TANKS DOESN'T SCREW UP THE BOTTOM FILE SELECT OPTION 
+; NOTE: THIS NEEDS A FIX SO THAT OBTAINING ALL 8 ENERGY TANKS DOESN'T SCREW UP THE FILE BELOW IN THE FILE SELECT OPTION
 
+;-------------------------------------
+;	Status bar sprite data
+;-------------------------------------
 %org($E1B9,15)	; $3E1C9
-; PPU transfer for Health digits
-;	db $21, $A0, $01, $38	; Tenths health digit moved to the right from $30 to $38
-;	db $21, $A0, $01, $40	; Units health digit moved to the right from $38 to $40
+; PPU transfers for HUD
+DataDisplayTbl:
+	db $21,$A0,$01,$38	; Upper health digit ($30->$38)
+	db $21,$A0,$01,$40	; Lower health digit ($38->$30)
+	db $2B,$FF,$01,$28	; Upper missile digit.
+	db $2B,$FF,$01,$30	; Middle missile digit.
+	db $2B,$FF,$01,$38	; Lower missile digit.
+	db $2B,$5E,$00,$18	; Left half of missile.
+	db $2B,$5F,$00,$20	; Right half of missile.
+	db $21,$76,$01,$18	; E
+	db $21,$7F,$01,$20	; N
+	db $21,$3A,$01,$28	; ... - Changed $00 to $01 to make "ENERGY" all blue
 
-; Make doors have unique tiles
+;-------------------------------------
+;   Make doors have unique tiles
+;-------------------------------------
 %org($E807,15)	; $3E817
 	; C9 A0 F0 06 C9 A1 D0 04
 	cmp.b #$A0
@@ -146,13 +165,7 @@ warnpc $B1F0
 	bcs $04
 
 ; C9 (A0 + normal doorway tiles) 90 06 C9 (A0 + normal doorway tiles + horizontal doorway tiles) B0 04
-
-%org($E1D5,15)	; $3E1E5
-; PPU transfer for "EN...", now "ENERGY"
-	db $21, $76, $01, $18	; E
-	db $21, $7F, $01, $20	; N
-	db $21, $3F, $01, $28	; ... - Changed $00 to $01 to make "ENERGY" all blue
-
+;-------------------------------------
 %org($F5F1,15)	; $3F601
 	nop	; Residual $15 from a BEQ $15
 %org($FFE6,15)	; $3FFF6

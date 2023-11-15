@@ -50,10 +50,10 @@ incsrc "code/header.asm"
 ;		Main code
 ;----------------------------------------
 
-incsrc "code/gameplay/misc.asm"
 incsrc "disassemblies/mother.asm"
-incsrc "code/gameplay/saving.asm"
+incsrc "code/gameplay/saving.asm"	; Missing Automap
 incsrc "code/gameplay/save-extra.asm"
+incsrc "code/gameplay/misc.asm"
 
 ;----------------------------------------
 ;		Messages/Text
