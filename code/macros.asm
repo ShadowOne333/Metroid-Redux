@@ -27,7 +27,9 @@ endmacro
 macro fillto(address,bank,byte)
 	if <bank> == 0
 		padbyte <byte> : pad <address>-$8000+!headersize
-	    else
+	elseif <bank> == 7 || <bank> == 15
+		padbyte <byte> : pad <address>-$C000+$4000*<bank>+!headersize
+	else
 		padbyte <byte> : pad <address>-$8000+$4000*<bank>+!headersize	
 	endif
 endmacro

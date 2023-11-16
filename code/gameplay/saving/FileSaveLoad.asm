@@ -132,9 +132,9 @@ endSection1:
 %org($A960,0)	; 0x02970
 LoadMapHijack:
 ; Push map loading routine address to stack
-	lda #$8F	; #>(MapLoadEntryPoint-1)
+	lda.b #(MapLoadEntryPoint-1 >>8)	; #$8F
 	pha
-	lda #$FF	; #<(MapLoadEntryPoint-1)
+	lda.b #(MapLoadEntryPoint-1)		; #$FF
 	pha
 	ldy #$0E
 	jmp !ROMSwitch
@@ -672,12 +672,12 @@ Section3End:
 ; -----------------------------------------
 ;		Section 4
 ; -----------------------------------------
-
-%org($FFD5,15)	; 0x00010, Bank $0F
+; Fast Doors routine. Modified to fix palette loading
+%org($FFD5,15)	; 0x3FFE5, Bank $0F
 Section4:
         ;FFD5 - FFF9        
 CheckMinHealth:
-	lda !HealthHigh	; Exit if health (including full tanks) >= 30
+	lda !HealthHigh	; Exit if health (including full tanks) >= 30, supposed to be $6877 (!TankCount) but it's $0107 in the source code
 	jsr !Amul16	;cmp #$03
 	ora #$09	;
 	;bcs +
@@ -783,7 +783,7 @@ EndFileSCreenItemStrings:
 ; -----------------------------------------
 ;    and modifications to existing code
 
-%org($C057,15)	; 0x
+%org($C057,15)	; 0x3C067
 ; Update memory clearing routine to leave save file SRAM alone
 	ldy #$74	; High byte of start address.
 	sty $01		;
@@ -907,13 +907,12 @@ EndOfDisplayPassword:
 	dw UpdateGameOverScreen	; $9470
 
 
-%org($C578,15)	; 0x
+%org($C578,15)	; 0x3C588
 ; Modify ClearSamusStats so that player health is not cleared. This allows the health value assigned by LoadGame to remain intact.
 ClearSamusStats:
 	ldy #$07
 	lda #$00
-	-
-		sta !MiniBossKillDelay,y
+	-	sta !MiniBossKillDelay,y
 		dey
 		bpl -
 	rts
@@ -929,7 +928,7 @@ InitializeStats:
 	jsr InitializeStats_InitHealth	; Jump to custom code
 
 
-%org($C920,15)	; 0x
+%org($C920,15)	; 0x3C930
 ; Hijack - Instead of initializing health to 030.0 every game, only set to 030.0 if it is less (i.e. player has died, or saved with very low health)
 	jmp CheckMinHealth
 

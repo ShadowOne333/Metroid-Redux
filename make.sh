@@ -95,7 +95,7 @@ Start()
 	echo "Patching 'Metroid Mother' patch...";
 	$flips -a -i "patches/Mother.ips" "$patched_rom"
 	echo "Patching 'Metroid+Saving' Unofficial' patch...";
-	$flips -a -i "patches/Saving.ips" "$patched_rom"
+	#$flips -a -i "patches/Saving.ips" "$patched_rom"
 
 	echo "Beginning main assembly code compilation with Asar..."; echo
 	$asar --no-title-check --fix-checksum=off $asm_file $patched_rom	# Main code

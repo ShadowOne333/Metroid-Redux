@@ -6,8 +6,7 @@ ShowMap:
 ; Clear sprite RAM	
 	ldy #$00
 	lda #$00
-	-
-		sta $0200,Y
+	-	sta $0200,y
 		iny
 	bne -
 

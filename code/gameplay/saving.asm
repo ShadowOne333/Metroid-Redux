@@ -56,10 +56,14 @@ incsrc "code/text/Text.tbl"
 !Timer1		= $2A	; Timer. Decremented every frame if > 0.
 !Timer2		= $2B	; Timer. Decremented every frame if > 0.
 !Timer3		= $2C	; Timer. Decremented every 10 frames if > 0.
+!FrameCount	= $2D	; Increments every frame(overflows every 256 frames)
+!RandomNumber1	= $2E	; Random numbers used--> 
+!RandomNumber2	= $2F	; throughout the game.
 !GamePaused	= $31
 !ScrollDir	= $49
 !MapPosY	= $4F	; Current y position on world map.
 !MapPosX	= $50	; Current x position on world map.
+!SpritePagePos	= $5B	; Index into sprite RAM used to load object sprite data
 !InArea		= $74	; The area the player is in.
 !MaxEnergyPickup	= $94	; Maximum energy power-ups that can be picked up. Randomly recalculated whenever Samus goes through a door.
 !First4SlowCntr	= $BC	; This address holds an 8 frame delay. When the delay is up, the crosshair sprites double their speed.
@@ -75,6 +79,8 @@ incsrc "code/text/Text.tbl"
 !OAM_Tile	= $0201
 !OAM_Att	= $0202
 !OAM_X		= $0203
+!ObjVertSpeed	= $0308
+!ObjHorzSpeed	= $0309
 !StartContinue	= $0325	; 0=START selected, 1=CONTINUE selected.
 !MenuSelection	= $0325
 !TriangleSFXFlag	= $0683	; Flags which, when set, cause sound effects to play. Used to make sounds on new menus.
@@ -122,7 +128,7 @@ incsrc "code/text/Text.tbl"
 !MapTop		= $32
 !MapWidth	= 7	; Map size, in tiles
 !MapHeight	= 7
-!SamusBlipTile = $BF
+!SamusBlipTile	= $BF
 
 	; Existing routines
 !UpdateSparkleSprites	= $87CF
@@ -134,10 +140,16 @@ incsrc "code/text/Text.tbl"
 !InitializeStats	= $932B	; Continue
 !PreparePPUProcess	= $9449	; Clears screen and writes "START CONTINUE".
 !PreparePPUProcess_	= $C20E
+!Adiv8			= $C2C0	; Divide by 8
+!Amul32			= $C2C4	; Multiply by 32
 !Amul16			= $C2C5	; Multiply by 16
 !ScreenOn		= $C447
 !NmiOn			= $C487	; Turn on VBlank interrupts
 !ROMSwitch		= $C4EF
+!SamusRun		= $CCC2
+!DisplayBar		= $E0C1
+!CheckMoveLeft		= $E880
+!CheckMoveRight		= $E88B
 !HexToDec		= $E198
 !Reset			= $FFB0
 
@@ -176,9 +188,9 @@ incsrc "saving/wavyIce.asm"
 
 base $7D00	; Modify base address so the jmp/jsr properly point to the right place in RAM address instead of ROM
 	db $00,$00,$00,$00
-
 	incsrc "saving/Map_RAM.asm"
 	incsrc "saving/WavyIce_RAM.asm"
+	incsrc "saving/AutomapPos.asm"
 
 base off
 

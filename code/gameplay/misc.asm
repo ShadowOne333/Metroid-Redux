@@ -117,15 +117,15 @@ warnpc $B1F0
 
 ; Fix palette loading from Fast Doors
 %org($C92B,15)	; $3C93B
-	jsr $FFD5	; Originally JSR $E1F1, changed to new code for Fast Doors which fixes wrong palette loading
+	jsr Section4	; Originally JSR $E1F1, changed to new code for Fast Doors which fixes wrong palette loading
 
 ;-------------------------------------
 ; Change ending times to make it more forgiveable
 %org($CB18,15)	; $3CB28
 	db $7A	; 4th ending with 37+ hours
-	db $14	; 3rd ending with 6 hours
+	db $14	; 3rd ending with 6 hours ($16->$14)
 	db $0A	; 2nd ending with 3 hours
-	db $05	; Make the best ending appear with ~1.5 hours (90 mins) instead of 1.2 (72 mins)
+	db $05	; Make the best ending appear with ~1.5 hours (90 mins) instead of 1.2 (72 mins), ($04->$05)
 
 %org($CE71,15)	; $3CE81
 	cmp.b #$00	; Changes low health beep to mute (originally #$08)
@@ -137,22 +137,6 @@ warnpc $B1F0
 	cmp #$07	; Change max tanks from $06 to $08 to accommodate for the extra 2 tanks you can get in the game
 ; NOTE: THIS NEEDS A FIX SO THAT OBTAINING ALL 8 ENERGY TANKS DOESN'T SCREW UP THE FILE BELOW IN THE FILE SELECT OPTION
 
-;-------------------------------------
-;	Status bar sprite data
-;-------------------------------------
-%org($E1B9,15)	; $3E1C9
-; PPU transfers for HUD
-DataDisplayTbl:
-	db $21,$A0,$01,$38	; Upper health digit ($30->$38)
-	db $21,$A0,$01,$40	; Lower health digit ($38->$30)
-	db $2B,$FF,$01,$28	; Upper missile digit.
-	db $2B,$FF,$01,$30	; Middle missile digit.
-	db $2B,$FF,$01,$38	; Lower missile digit.
-	db $2B,$5E,$00,$18	; Left half of missile.
-	db $2B,$5F,$00,$20	; Right half of missile.
-	db $21,$76,$01,$18	; E
-	db $21,$7F,$01,$20	; N
-	db $21,$3A,$01,$28	; ... - Changed $00 to $01 to make "ENERGY" all blue
 
 ;-------------------------------------
 ;   Make doors have unique tiles
@@ -166,7 +150,5 @@ DataDisplayTbl:
 
 ; C9 (A0 + normal doorway tiles) 90 06 C9 (A0 + normal doorway tiles + horizontal doorway tiles) B0 04
 ;-------------------------------------
-%org($F5F1,15)	; $3F601
-	nop	; Residual $15 from a BEQ $15
-%org($FFE6,15)	; $3FFF6
-	db $FF	; Residual RTS (why?)
+
+
