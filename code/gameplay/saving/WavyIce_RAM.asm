@@ -4,7 +4,7 @@ WavyIce_NewBehavior:
 	and #$40	; Has wave?
 	beq NoWave
 	jmp $D52C	; Yes - UpdateWaveBullet
-	;(normally UpdateWaveBullet isn't called when you have ice, even if you do have wave)
+	; (normally UpdateWaveBullet isn't called when you have ice, even if you do have wave)
 
 NoWave:
 	jmp $D4EB	; No - UpdateBullet

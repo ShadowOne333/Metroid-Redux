@@ -51,7 +51,6 @@ incsrc "code/text/Text.tbl"
 !Joy1Status	= $14	; Buttons held this frame
 !Joy2Status	= $15	;
 !PalDataPending	= $1C	; Pending palette data. Palette # = PalDataPending - 1
-!FileSize_NoChecksum	= $1E
 !TitleRoutine	= $1F	; Identifies which "mode" title screen is in (title screen uses a state machine)
 !Timer1		= $2A	; Timer. Decremented every frame if > 0.
 !Timer2		= $2B	; Timer. Decremented every frame if > 0.
@@ -92,31 +91,51 @@ incsrc "code/text/Text.tbl"
 !MissileCount	= $6879	; Number of missiles player has.
 !MaxMissiles	= $687A	; Maximum number of missiles player can carry
 !PasswordBytes	= $6988	; Un-encoded password data
+BankLock	= $6FF0
+RoomDataBanked	= $6FF1
 
-!File_InUse	= $7500
-!SaveFiles	= $7500
-!File_PassData	= $7501
+;-------------------------------------
+; Save memory + some vars
 
-!File_Health	= $7517
-!File_SamusGear	= $7519
-!File_Missiles	= $751A
-!File_MissileMax	= $751B
-!File_Area	= $751C
-!File_Tanks	= $751D
-!File_Checksum	= $751E
-!File_Checkxor	= $751F
-!localVar	= $7560
-!localVar2	= $7561
-!localVar3	= $7562
-!CursorDisplayX	= $7563
-!CursorDisplayY	= $7564
-!CursorX	= $7565
-!CursorY	= $7566
-!DeleteMode	= $7567
-!MinimapX	= $7D00
-!MinimapY	= $7D01
-!BlipX		= $7D02
-!BlipY		= $7D03
+struct SaveFiles $7500
+; Note that File_PassData hold all of the actual save data (except for health). This variable holds the password, which is handed off the the already-present password system to resume gameplay. Other variables present in the file are either there (A) to manage the file or (B) as an easily-accesible variable used to render the file menu since it is difficult to extract this info from the password.
+	.File1:
+	.File_InUse:	skip 1	; 0 = empty, 1 = in use
+	.File_PassData	skip $12	; Password data (see PasswordBytes). This holds all the important save data. 
+	.File_UnusedBytes	skip 4	; Not currently used. (Feel free to use this to save extra data if you're making a hack!)
+	.File_Health	skip 2	; Health (from HealthHi and HealthLo)
+	.File_SamusGear	skip 1	; Equipment (from SamusGear) (for File Menu drawing only)
+	.File_Missiles	skip 1	; Missiles (for File Menu drawing only)
+	.File_MissileMax	skip 1	; Missile Capacity (for File Menu drawing only)
+	.File_Area	skip 1	; The area the player saved in. This value is written upon save, but never used anywhere else. Displaying the area the player saved in was considered.
+	.File_Tanks	skip 1	; The number of tanks the player has. (for File Menu drawing only)
+	.File_Checksum	skip 1	; The sum (truncated) of all previous file variables, used to verify the file.
+	.File_Checkxor	skip 1	; The value produced by xoring all file bytes together, excluding Checksum and Checkxor, used to verify the file.
+	.EndFile1:
+		!FileSize	= (SaveFiles.EndFile1-SaveFiles.File1)	; $20
+		!FileSize_NoChecksum	= !FileSize-2	; $1E
+	.File2:	skip $20	; !FileSize
+
+	.File3:	skip $20	; !FileSize
+
+; General purpose vars
+	.localVar:	skip 1	; $7560, General use
+	.localVar2:	skip 1	; General use
+	.localVar3:	skip 1	; General use
+; Menu Cursor
+	.CursorDisplayX:	skip 1	; Shown cursor position (cursor will 'slide' toward actual position)
+	.CursorDisplayY:	skip 1
+	.CursorX:	skip 1	; Actual cursor position
+	.CursorY:	skip 1
+	.DeleteMode:	skip 1	; 0 = no, 1 = yes
+
+endstruct
+
+!FileIndex_1 = $00
+!FileIndex_2 = !FileSize
+!FileIndex_3 = !FileSize*2
+
+;-------------------------------------
 
 	; Constants
 !PasswordDataSize	=  $12	; Number of bytes is password data (see PasswordBytes)
@@ -161,14 +180,6 @@ incsrc "code/text/Text.tbl"
 	;.error MapRAM must begin on a $100 byte boundary 
 ;endif
 
-;EndFile1:
-;	!File_1 = $7501
-;	!FileSize = <(!EndFile1-!File_1)
-
-!FileIndex_1 = $00
-!FileIndex_2 = !FileSize
-!FileIndex_3 = !FileSize*2
-
 ;-------------------------------------
 ;	ROM executed code
 ;-------------------------------------
@@ -190,9 +201,12 @@ base $7D00	; Modify base address so the jmp/jsr properly point to the right plac
 	db $00,$00,$00,$00
 	incsrc "saving/Map_RAM.asm"
 	incsrc "saving/WavyIce_RAM.asm"
-	incsrc "saving/AutomapPos.asm"
+	incsrc "saving/MinimapPos.asm"
 
 base off
+
+; Additional code added for Saving Unofficial v0.4 - v0.5.2
+incsrc "code/gameplay/saving/Minimap.asm"
 
 ;-------------------------------------------------------------------
 ; Free memory
@@ -206,5 +220,33 @@ base off
 ;   $9960 - $9983 - free
 ;   $A961 - $ABFF - FileSaveLoad.asm
 
-;-------------------------------------------------------------------
+; ================================
+; Bank Lock Fix
+; ================================
+; All of the code from here forward fixes a bug in older versions of the hack.
+; The bank lock variables used to be stored in the same region of WRAM as the save files, so it wasn't cleared on RESET. This means, if there is garbage in the RAM, the lock may be set on boot, which causes a deadlock!
+
+; Here we just update all references to said variable to use memory locations that will be cleared on RESET
+
+%org($CA36,15)	; $3CA46
+	dw BankLock
+%org($CA46,15)	; $3CA56
+	dw BankLock
+%org($CA4B,15)	; $3CA5B
+	dw BankLock
+%org($CA52,15)	; $3CA62
+	dw BankLock
+%org($CAB5,15)	; $3CAC5
+	dw BankLock
+
+%org($CA3B,15)	; $3CA4B
+	dw RoomDataBanked
+%org($CA57,15)	; $3CA67
+	dw RoomDataBanked
+%org($CABF,15)	; $3CACF
+	dw RoomDataBanked
+%org($CACC,15)	; $3CADC
+	dw RoomDataBanked
+
+
 

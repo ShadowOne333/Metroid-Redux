@@ -1594,7 +1594,8 @@ l_CA45:
 
 ; Change the Display bar jump
 %org($CB57,15)	; 0x3CB67
-	jsr $7EA8	; Originally $E0C1 (DisplayBar)
+; Jump to custom Minimap (minimappos.asm) routine
+	jsr Minimap	; Originally $E0C1 (DisplayBar)
 
 ; Modify the Samus Run animation pointer
 %org($CC24,15)	; 0x3CC34

@@ -6,8 +6,8 @@
 FileIndexList:
 ; Used to retrieve file index for a given save file number
 ; File Index 1, 2, 3
-	;db !FileIndex_1,!FileIndex_2,!FileIndex_3
-	db $00,$20,$40
+	;	$00,	   $20,		$40
+	db !FileIndex_1,!FileIndex_2,!FileIndex_3
 
 InitFileDisplay:
 ; Verifies files are valid, then draws the file menu.
@@ -18,6 +18,7 @@ InitFileDisplay:
 	jsr VerifyFile
 	ldy #$02
 	jsr VerifyFile
+
 ; Render files
 	ldy #$00
 	jsr RenderFile
@@ -25,13 +26,15 @@ InitFileDisplay:
 	jsr RenderFile
 	ldy #$02
 	jsr RenderFile
+
 ; Init menu variables
 	ldy #$00
 	sty !MenuSelection	; MenuSelection = 0
-	sty !DeleteMode		; DeleteMode = false
+	sty SaveFiles.DeleteMode	; DeleteMode = false
 	dey
-	sty !CursorDisplayX	; CursorDisplayX/Y are set to FF (lower-right
-	sty !CursorDisplayY	; corner). This causes the cursor to zip into place when the menu is shown.
+	sty SaveFiles.CursorDisplayX	; CursorDisplayX/Y are set to FF (lower-right
+	sty SaveFiles.CursorDisplayY	; corner). This causes the cursor to zip into place when the menu is shown.
+
         ;return from hijack
 	jmp !ScreenOn		
 
@@ -44,24 +47,24 @@ VerifyFile:
 	stx !SaveFileIndex
 
 ; If file is not in use, don't bother verifying
-	lda !File_InUse,x
+	lda SaveFiles.File_InUse,x
 	beq Exit
 
 ; Verify checksum 
 	jsr GetFileSum		; Get checksum
 	ldx !SaveFileIndex	; Get file index
-	cmp !File_Checksum,x	; Compare to stored checksum
+	cmp SaveFiles.File_Checksum,x	; Compare to stored checksum
 	bne ClearFile		; Mark file unused if checksum invalid
 
 ; Verify check XOR
 	jsr GetFileXor		; Get checkxor
 	ldx !SaveFileIndex	; Get file index
-	cmp !File_Checkxor,x	; Compare to stored checkxor
+	cmp SaveFiles.File_Checkxor,x	; Compare to stored checkxor
 	beq Exit		; Mark file unused if checkxor invalid
 
 ClearFile:	
 	lda #$00
-	sta !File_InUse,x
+	sta SaveFiles.File_InUse,x
 
 Exit:	
 	rts
@@ -72,19 +75,19 @@ GetFileSum:	; $BE28
 ; x [in]    File index
 ; a [out]   Sum
 	lda #$00
-	ldy #!FileSize_NoChecksum
--	clc
-	adc !File_InUse,x
-	inx
-	dey
+	ldy.b #!FileSize_NoChecksum
+	-	clc
+		adc SaveFiles.File_InUse,x
+		inx
+		dey
 	bne -
 	rts
 
 GetFileXor:	; $BE35
 	lda #$00
-	ldy #!FileSize_NoChecksum
+	ldy.b #!FileSize_NoChecksum
 	-	clc
-		eor !SaveFiles,x
+		eor SaveFiles,x
 		inx
 		dey
 		bne -
@@ -156,10 +159,10 @@ RenderFile:
 	tya
 	asl
 	tay
-	sty !localVar2
-	lda !File_InUse,x	; If file is empty, blank it out 
+	sty SaveFiles.localVar2
+	lda SaveFiles.File_InUse,x	; If file is empty, blank it out 
 	bne RenderUsedFile
-	jmp RenderEmptyFile	; Jump to new code
+		jmp RenderEmptyFile	; Jump to new code
 
 RenderUsedFile:
 ; Start by drawing all possible equipment, then blank out equipment player doesn't have
@@ -167,25 +170,26 @@ RenderUsedFile:
 	lda FileItemStrings+1,y
 	tay
 	jsr !PreparePPUProcess_
-	ldy !localVar2
+
+	ldy SaveFiles.localVar2
 	ldx !SaveFileIndex
-	lda !File_SamusGear,x
-	sta !localVar3
+	lda SaveFiles.File_SamusGear,x
+	sta SaveFiles.localVar3
 
 	lda #$07	; process 8 bits
-	sta !localVar
+	sta SaveFiles.localVar
 	loop:
-		lda !localVar3		; Get equipment
-		ldx !localVar		; Which item are we checking?
+		lda SaveFiles.localVar3		; Get equipment
+		ldx SaveFiles.localVar		; Which item are we checking?
 		and EquipmentFlags,x	; Check it.
 		bne skipItem		; Don't blank it out if player has it.
-			ldy !localVar2	; Get ptr table index
+			ldy SaveFiles.localVar2	; Get ptr table index
 			lda ItemPPUAddresses+1,y	; PPU Dest High
 			sta !SmallStringRam
-			lda !localVar	; PPU Dest Low (3 * item_index + base_address)
+			lda SaveFiles.localVar	; PPU Dest Low (3 * item_index + base_address)
 			asl		; item index * 2
 			clc
-			adc !localVar	; + item index
+			adc SaveFiles.localVar	; + item index
 			adc ItemPPUAddresses,y	; + base address
 			sta !SmallStringRam+1
 			lda #$42	; PPU Length byte (two tiles, RLE)
@@ -214,29 +218,31 @@ RenderUsedFile:
 			jsr !PreparePPUProcess_
 
 skipItem:
-		dec !localVar
+		dec SaveFiles.localVar
 	bpl loop
 	
 BlankTanks:
 ; 8 tanks are currently shown. Blank enough to show correct amt
 	ldx !SaveFileIndex	; Get tank count
-	lda !File_Tanks,x
-	sta !localVar
+	lda SaveFiles.File_Tanks,x
+	sta SaveFiles.localVar
 
-	ldy !localVar2		; Get PPU address of tanks
+	ldy SaveFiles.localVar2		; Get PPU address of tanks
 	lda TankPPUAddresses+1,y		; PPU dest high
 	sta !SmallStringRam
 	lda TankPPUAddresses,y	; PPU dest low
 	clc
-	adc !localVar		; + tank count (leave this many tanks)
+	adc SaveFiles.localVar		; + tank count (leave this many tanks)
 	sta !SmallStringRam+1
 
 	lda #$48		; 8 tiles, RLE
 	sec
-	sbc !localVar		; - tank count
+	sbc SaveFiles.localVar		; - tank count
 	sta !SmallStringRam+2
+
 	lda #$FF		; FF = blank tiles
 	sta !SmallStringRam+3
+
 	cmp #$40		; If player has 8 tanks, there is nothing to blank out. Move on to next thing.
 	beq DontBlankTanks
 
@@ -246,14 +252,14 @@ BlankTanks:
 
 DontBlankTanks:
 ShowMissiles:
-	ldy !localVar2		; Calculate PPU address of missiles (to right of tanks)
+	ldy SaveFiles.localVar2		; Calculate PPU address of missiles (to right of tanks)
 	lda TankPPUAddresses,y
 	clc
 	adc #$0B
 	sta !SmallStringRam+1
 
 	ldx !SaveFileIndex	; Get missile count, convert to decimal
-	lda !File_Missiles,x
+	lda SaveFiles.File_Missiles,x
 	jsr !HexToDec
 
 	ldx #$03		; Insert into PPU string
@@ -267,7 +273,7 @@ ShowMissiles:
 	pha
 
 	ldx !SaveFileIndex	; Get missile capacity, convert to decimal
-	lda !File_MissileMax,x
+	lda SaveFiles.File_MissileMax,x
 	jsr !HexToDec
 
 	pla			; Back to our PPU string
@@ -277,6 +283,7 @@ ShowMissiles:
 
 	lda #$00		; Add our zero terminator
 	sta !SmallStringRam,x
+
 	lda #$07		; string size is 7 (two 3-digit nums + slas)
 	sta !SmallStringRam+2
 
@@ -328,23 +335,24 @@ SaveGame:	; $AA7D
 
 	ldx !SaveFileIndex	; Mark file as in-use
 	lda #$01
-	sta !File_InUse,x
+	sta SaveFiles.File_InUse,x
 
 	lda !SamusGear		; Save equipment, area, health for menu display 
-	sta !File_SamusGear,x
+	sta SaveFiles.File_SamusGear,x
 	lda !TankCount
-	sta !File_Tanks,x
+	sta SaveFiles.File_Tanks,x
 	lda !MissileCount
-	sta !File_Missiles,x
+	sta SaveFiles.File_Missiles,x
 	lda !MaxMissiles
-	sta !File_MissileMax,x
+	sta SaveFiles.File_MissileMax,x
 	lda !InArea
 	and #$0F		; Only need lower nibble of area
-	sta !File_Area,x
+
+	sta SaveFiles.File_Area,x
 	lda !HealthLow
-	sta !File_Health,x
+	sta SaveFiles.File_Health,x
 	lda !HealthHigh
-	sta !File_Health+1,x
+	sta SaveFiles.File_Health+1,x
 
 	lda #$11		; Copy the $12 bytes of password data
 	tay			; ($11 to $00)
@@ -354,7 +362,7 @@ SaveGame:	; $AA7D
 
 	ldy #$11
 	-	lda !PasswordBytes,y
-		sta !File_PassData,x
+		sta SaveFiles.File_PassData,x
 		dex
 		dey
 	bpl -
@@ -362,22 +370,22 @@ SaveGame:	; $AA7D
 	ldx !SaveFileIndex	; Calculate and save checksums
 	jsr GetFileSum
 	ldx !SaveFileIndex	; (X overwritten by checksum routine)
-	sta !File_Checksum,x
+	sta SaveFiles.File_Checksum,x
 	jsr GetFileXor
 	ldx !SaveFileIndex	; (X overwritten by checkxor routine)
-	sta !File_Checkxor,x
+	sta SaveFiles.File_Checkxor,x
 
 	rts
 
 LoadGame:
 	ldx !SaveFileIndex	; If file is empty, start a new game
-	lda !File_InUse,x
+	lda SaveFiles.File_InUse,x
 	bne +
 		jmp InitializeStats
 
-+	lda !File_Health,x	; Load player health
++	lda SaveFiles.File_Health,x	; Load player health
 	sta !HealthLow
-	lda !File_Health+1,x
+	lda SaveFiles.File_Health+1,x
 	sta !HealthHigh
 
 	txa			; Copy 12 password data bytes
@@ -385,7 +393,7 @@ LoadGame:
 	adc #$11
 	tax
 	ldy #$11
-	-	lda !File_PassData,x
+	-	lda SaveFiles.File_PassData,x
 		sta !PasswordBytes,y
 		dex
 		dey
@@ -440,7 +448,7 @@ NoUpDown:
 	and #$E0
 	beq +
 		lda #$00
-		sta !DeleteMode
+		sta SaveFiles.DeleteMode
 
 		lda !MenuSelection	; If "ERASE" selected, move to irst item
 		cmp #$03
@@ -459,8 +467,8 @@ NoUpDown:
 		lda #$00	 ; Select File 1
 		sta !MenuSelection
 		lda #$03
-		eor !DeleteMode 	; Toggle Deletion mode
-		sta !DeleteMode 
+		eor SaveFiles.DeleteMode 	; Toggle Deletion mode
+		sta SaveFiles.DeleteMode 
 		jsr GulpSound	; Play Gulp sound
 
 	+
@@ -470,35 +478,31 @@ UpdateFileCursor:	; $AB7C
 ; Updates cursor display position for "gliding" effect
 	ldy !MenuSelection	; Get cursor position based on currently selected item
 	lda CursorPositionX,y
-	sta !CursorX
+	sta SaveFiles.CursorX
 	lda CursorPositionY,y
-	sta !CursorY
+	sta SaveFiles.CursorY
 
 ; Updates display position of cursor to glide to actual position
 	lda #$00		; High byte for 16-bit math (use A for low byte)
-	sta !localVar
+	sta SaveFiles.localVar
 
-	lda !CursorX		; Cursor X
-	cmp !CursorDisplayX	; (add 1 extra (via carry flag) if actual pos is greater, to round up when we divide)
-	adc !CursorDisplayX	; + display x
+	lda SaveFiles.CursorX		; Cursor X
+	cmp SaveFiles.CursorDisplayX	; (add 1 extra (via carry flag) if actual pos is greater, to round up when we divide)
+	adc SaveFiles.CursorDisplayX	; + display x
 	bcc +
-		inc !localVar	; Carry to high byte
-	+
-
-	lsr !localVar		; 16-bit divide by 2
+		inc SaveFiles.localVar	; Carry to high byte
++	lsr SaveFiles.localVar		; 16-bit divide by 2
 	ror
-	sta !CursorDisplayX
+	sta SaveFiles.CursorDisplayX
 ; Don't need to reset localVar, it was cleared when we divided
-	lda !CursorY		; Cursor Y
-	cmp !CursorDisplayY	; (+ 1 (via carry) if actual pos is greater, to round up when we divide)
-	adc !CursorDisplayY	; + display Y
+	lda SaveFiles.CursorY		; Cursor Y
+	cmp SaveFiles.CursorDisplayY	; (+ 1 (via carry) if actual pos is greater, to round up when we divide)
+	adc SaveFiles.CursorDisplayY	; + display Y
 	bcc +
-		inc !localVar	; Carry to high byte
-	+
-
-	lsr !localVar		; 16-bit divide by 2
+		inc SaveFiles.localVar	; Carry to high byte
++	lsr SaveFiles.localVar		; 16-bit divide by 2
 	ror
-	sta !CursorDisplayY
+	sta SaveFiles.CursorDisplayY
 
 	rts
 
@@ -507,21 +511,21 @@ DrawFileCursor:		; $ABBB
 	ldy #$00
 	ldx #$00
 
-	lda !CursorDisplayX
-	sta !localVar
+	lda SaveFiles.CursorDisplayX
+	sta SaveFiles.localVar
 	-	lda CursorTiles,y	; Get tile number
 		beq DoneDrawing		; If zero, we are done
 		sta $0201,x		; Sprite Y
-		lda !CursorDisplayY
+		lda SaveFiles.CursorDisplayY
 		sta $0200,x
 		lda #$21		; Spr Attr (Behind text, pal 1)
-		eor !DeleteMode		; (pal 0 if erase mode)
+		eor SaveFiles.DeleteMode		; (pal 0 if erase mode)
 		sta $0202,x
-		lda !localVar		; Sprite X 
+		lda SaveFiles.localVar		; Sprite X 
 		sta $0203,x
 		clc			; Next tile 8 px to the right
 		adc #$08
-		sta !localVar
+		sta SaveFiles.localVar
 
 		inx			; Next sprite
 		inx
@@ -678,7 +682,7 @@ Section4:
         ;FFD5 - FFF9        
 CheckMinHealth:
 	lda !HealthHigh	; Exit if health (including full tanks) >= 30, supposed to be $6877 (!TankCount) but it's $0107 in the source code
-	jsr !Amul16	;cmp #$03
+	jsr !Amul16	; cmp #$03
 	ora #$09	;
 	;bcs +
 		;lda #$03
@@ -821,13 +825,14 @@ ChooseStartContinue:
 
 		cmp #$03
 		beq +
-		ldy !DeleteMode
+
+		ldy SaveFiles.DeleteMode
 		bne EraseFile
 		jmp LoadGame
 
 	EraseFile:
 		lda #$00
-		sta !File_InUse,x
+		sta SaveFiles.File_InUse,x
 		jmp !Reset
 	+
 

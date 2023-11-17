@@ -1,5 +1,14 @@
 ; The map hack places the needed code and data into RAM at $7900 ($600 bytes (max))
+;-------------------------------------
+struct MapRAM $7D00
 
+	.MinimapX:	skip 1
+	.MinimapY:	skip 1
+	.BlipX:		skip 1
+	.BlipY:		skip 1	; $7D03
+
+endstruct
+;-------------------------------------
 ShowMap:
 ; Uses $00, $01, $02
 	
@@ -21,7 +30,7 @@ DrawMap:
 	; Draw samus blip
 	ldy #$00
 
-	lda !BlipX	; Calculate blip X
+	lda MapRAM.BlipX	; Calculate blip X
 	bmi skipBlip	; Hide blip if off map display
 	cmp #!MapWidth
 	bcs skipBlip	
@@ -32,7 +41,7 @@ DrawMap:
 	adc #!MapLeft+8	; Why is this off by one square?
 	sta !OAM_X,y
 	
-	lda !BlipY		; Calculate blip Y
+	lda MapRAM.BlipY		; Calculate blip Y
 	bmi skipBlip		; Hide blip if off map display
 	cmp #!MapHeight
 	bcs skipBlip 
@@ -121,7 +130,7 @@ GetMapTile:
 	stx $04
 
 	clc
-	adc !MinimapY	; Get absolute Y
+	adc MapRAM.MinimapY	; Get absolute Y
 	sec
 	sbc #$03
 	bcc YOutOfRange	; If < 0, out of range. Use blank tile
@@ -143,7 +152,7 @@ GetMapTile:
 
 	lda $03
 	clc		; Get absolute X
-	adc !MinimapX
+	adc MapRAM.MinimapX
 	sec
 	sbc #$03
 	bcc XOutOfRange	; If < 0, its out of range, use a blank tile
@@ -166,9 +175,9 @@ YOutOfRange:
 	
 GetMapCords:
 	lda !MapPosX
-	sta !MinimapX
+	sta MapRAM.MinimapX
 	lda !MapPosY
-	sta !MinimapY
+	sta MapRAM.MinimapY
 
 	lda !ScrollDir
 	and #$02
@@ -181,11 +190,11 @@ vert:
 	lda !ScrollDir
 	cmp #$01
 	bne +   
-		dec !MinimapY
+		dec MapRAM.MinimapY
 	+
 	lda !ScrollY
 	bpl +
-		inc !MinimapY
+		inc MapRAM.MinimapY
 	+
 	jmp return
 	
@@ -196,18 +205,18 @@ horiz:
 	lda !ScrollDir
 	cmp #$03
 	bne +
-		dec !MinimapX
+		dec MapRAM.MinimapX
 	+
 	lda !ScrollX
 	bpl +
-		inc !MinimapX
+		inc MapRAM.MinimapX
 	+
 	
 return:
 ; Place blip
 	lda #$03
-	sta !BlipX
-	sta !BlipY
+	sta MapRAM.BlipX
+	sta MapRAM.BlipY
 	
 	rts
 
@@ -218,33 +227,33 @@ MapInputHandler:
 	
 	cmp #!Joy_Up
 	bne +
-		ldx !MinimapY	; Don't move up past edge of map
+		ldx MapRAM.MinimapY	; Don't move up past edge of map
 		beq +
-		dec !MinimapY
-		inc !BlipY
+		dec MapRAM.MinimapY
+		inc MapRAM.BlipY
 	+
 	cmp #!Joy_Down
 	bne +
-		ldx !MinimapY	; Don't move right past edge of map
+		ldx MapRAM.MinimapY	; Don't move right past edge of map
 		cpx #$1F
 		beq +
-		inc !MinimapY
-		dec !BlipY
+		inc MapRAM.MinimapY
+		dec MapRAM.BlipY
 	+
 	cmp #!Joy_Left
 	bne +
-		ldx !MinimapX	; Don't move up past edge of map
+		ldx MapRAM.MinimapX	; Don't move up past edge of map
 		beq +
-		dec !MinimapX
-		inc !BlipX
+		dec MapRAM.MinimapX
+		inc MapRAM.BlipX
 	+
 	cmp #!Joy_Right
 	bne +
-		ldx !MinimapX	; Don't move right past edge of map
+		ldx MapRAM.MinimapX	; Don't move right past edge of map
 		cpx #$1F
 		beq +
-		inc !MinimapX
-		dec !BlipX
+		inc MapRAM.MinimapX
+		dec MapRAM.BlipX
 	+
 	
 	jsr DrawMap

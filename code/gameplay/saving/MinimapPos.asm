@@ -1,7 +1,9 @@
+Minimap:
+l_7EA8:	; $399B8
 	jsr GetMapCords
-	dec !MinimapY
-	dec !MinimapX
-	lda !MinimapY
+	dec MapRAM.MinimapY
+	dec MapRAM.MinimapX
+	lda MapRAM.MinimapY
 	pha
 	jsr !Adiv8
 	clc
@@ -10,7 +12,7 @@
 	pla
 	jsr !Amul32
 	clc
-	adc !MinimapX
+	adc MapRAM.MinimapX
 	sta $00
 	lda $01
 	adc #$00
@@ -84,3 +86,5 @@ l_7ED7:
 		bne +
 		jsr $CD40	; Samus Horz Speed Max
 +	jmp !SamusRun
+
+
