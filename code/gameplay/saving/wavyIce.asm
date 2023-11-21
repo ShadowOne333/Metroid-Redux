@@ -6,7 +6,7 @@
 ; NOPs out the code that removes one beam
 ; when the play aquires another.
 ;===========================================
-%org($DBD2,$15)	; 0x00010, Bank $0F
+%org($DBD2,$15)	; 0x3DBE2, Bank $0F
 ;.PATCH 0F:DBD2
 
 	nop #3 ; LDA $6878

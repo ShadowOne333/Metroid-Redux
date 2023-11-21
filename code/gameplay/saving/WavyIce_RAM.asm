@@ -1,6 +1,6 @@
 WavyIce_NewBehavior:
 
-	lda !SamusGear	; Check equipment
+	lda SamusGear	; Check equipment
 	and #$40	; Has wave?
 	beq NoWave
 	jmp $D52C	; Yes - UpdateWaveBullet

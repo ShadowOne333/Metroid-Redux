@@ -42,8 +42,8 @@ warnpc $8AE9
 
 %org($B135,1)	; $07145
 ; Unused tile patterns, up to $B200
-	lda.b $4D
-	cmp.b #$01
+	lda $4D
+	cmp #$01
 	beq left_table
 	bne right_table
 
@@ -108,9 +108,9 @@ warnpc $B1F0
 ;-------------------------------------
 ; Corner map position
 %org($99D1,14)	; $399E1
-	lda.b #$17	; Move corner map Y position
+	lda #$17	; Move corner map Y position
 %org($99D9,14)	; $399E9
-	lda.b #$D0	; Move corner map X position
+	lda #$D0	; Move corner map X position
 
 
 ;-------------------------------------
@@ -128,10 +128,7 @@ warnpc $B1F0
 	db $05	; Make the best ending appear with ~1.5 hours (90 mins) instead of 1.2 (72 mins), ($04->$05)
 
 %org($CE71,15)	; $3CE81
-	cmp.b #$00	; Changes low health beep to mute (originally #$08)
-%org($D0F5,15)	; $3D105
-	adc.b #$00	; Changes out of Morph ball sound? (originally #$08)
-; D4FB -> 7E66
+	cmp #$00	; Changes low health beep to mute (originally #$08)
 
 %org($DC03,15)	; $3DC13
 	cmp #$07	; Change max tanks from $06 to $08 to accommodate for the extra 2 tanks you can get in the game
@@ -143,9 +140,9 @@ warnpc $B1F0
 ;-------------------------------------
 %org($E807,15)	; $3E817
 	; C9 A0 F0 06 C9 A1 D0 04
-	cmp.b #$A0
+	cmp #$A0
 	bcc $06
-	cmp.b #$A7
+	cmp #$A7
 	bcs $04
 
 ; C9 (A0 + normal doorway tiles) 90 06 C9 (A0 + normal doorway tiles + horizontal doorway tiles) B0 04

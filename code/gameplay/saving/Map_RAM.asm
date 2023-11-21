@@ -1,6 +1,6 @@
 ; The map hack places the needed code and data into RAM at $7900 ($600 bytes (max))
 ;-------------------------------------
-struct MapRAM $7D00
+struct MinimapRAM $7D00
 
 	.MinimapX:	skip 1
 	.MinimapY:	skip 1
@@ -30,38 +30,38 @@ DrawMap:
 	; Draw samus blip
 	ldy #$00
 
-	lda MapRAM.BlipX	; Calculate blip X
+	lda MinimapRAM.BlipX	; Calculate blip X
 	bmi skipBlip	; Hide blip if off map display
-	cmp #!MapWidth
+	cmp #MapWidth
 	bcs skipBlip	
 	asl
 	asl
 	asl
 	clc
-	adc #!MapLeft+8	; Why is this off by one square?
-	sta !OAM_X,y
+	adc #MapLeft+8	; Why is this off by one square?
+	sta OAM_X,y
 	
-	lda MapRAM.BlipY		; Calculate blip Y
+	lda MinimapRAM.BlipY		; Calculate blip Y
 	bmi skipBlip		; Hide blip if off map display
-	cmp #!MapHeight
+	cmp #MapHeight
 	bcs skipBlip 
 	asl
 	asl
 	asl
 	clc
-	adc #!MapTop
-	sta !OAM_Y,y
+	adc #MapTop
+	sta OAM_Y,y
 
 	lda #$00
-	sta !OAM_Att,y
-	lda #!SamusBlipTile
-	sta !OAM_Tile,y
+	sta OAM_Att,y
+	lda #SamusBlipTile
+	sta OAM_Tile,y
 
 	jmp DrawMapTiles
 
 skipBlip:	; Hide blip sprite
 	lda #$F4
-	sta !OAM_Y,y
+	sta OAM_Y,y
 
 DrawMapTiles:
 	lda #$00
@@ -74,25 +74,25 @@ DrawMapTiles:
 		asl
 		asl
 		clc
-		adc #!MapTop	; + top of grid
+		adc #MapTop	; + top of grid
 		sta $01
 
 		; Get screen X coordinate
-		lda #(!MapLeft+!MapWidth*8)
+		lda #(MapLeft+MapWidth*8)
 		sta $02
 
-		ldx #!MapWidth-1	; 7 screens per row
+		ldx #MapWidth-1	; 7 screens per row
 		cellLoop:
 			lda $02
-			sta !OAM_X,y
+			sta OAM_X,y
 			lda $01
-			sta !OAM_Y,y
+			sta OAM_Y,y
 			lda #$01
-			sta !OAM_Att,y
+			sta OAM_Att,y
 
 			lda $00
 			jsr GetMapTile
-			sta !OAM_Tile,y
+			sta OAM_Tile,y
 
 			; Next tile 8 px to the right
 			lda $02
@@ -109,7 +109,7 @@ DrawMapTiles:
 
 		inc $00
 		lda $00
-		cmp #!MapHeight	  ; 7 rows
+		cmp #MapHeight	  ; 7 rows
 
 	bne rowLoop
 	
@@ -130,7 +130,7 @@ GetMapTile:
 	stx $04
 
 	clc
-	adc MapRAM.MinimapY	; Get absolute Y
+	adc MinimapRAM.MinimapY	; Get absolute Y
 	sec
 	sbc #$03
 	bcc YOutOfRange	; If < 0, out of range. Use blank tile
@@ -147,12 +147,12 @@ GetMapTile:
 
 	; Add address of map data in RAM
 	clc
-	adc.b #!MapRAM>>8
+	adc.b #MapRAM>>8
 	sta $05
 
 	lda $03
 	clc		; Get absolute X
-	adc MapRAM.MinimapX
+	adc MinimapRAM.MinimapX
 	sec
 	sbc #$03
 	bcc XOutOfRange	; If < 0, its out of range, use a blank tile
@@ -174,86 +174,86 @@ YOutOfRange:
 	rts
 	
 GetMapCords:
-	lda !MapPosX
-	sta MapRAM.MinimapX
-	lda !MapPosY
-	sta MapRAM.MinimapY
+	lda MapPosX
+	sta MinimapRAM.MinimapX
+	lda MapPosY
+	sta MinimapRAM.MinimapY
 
-	lda !ScrollDir
+	lda ScrollDir
 	and #$02
 	bne horiz
 	
 vert:	
-	lda !ScrollY
+	lda ScrollY
 	beq return
 	
-	lda !ScrollDir
+	lda ScrollDir
 	cmp #$01
 	bne +   
-		dec MapRAM.MinimapY
+		dec MinimapRAM.MinimapY
 	+
-	lda !ScrollY
+	lda ScrollY
 	bpl +
-		inc MapRAM.MinimapY
+		inc MinimapRAM.MinimapY
 	+
 	jmp return
 	
 horiz:
-	lda !ScrollX
+	lda ScrollX
 	beq return
 
-	lda !ScrollDir
+	lda ScrollDir
 	cmp #$03
 	bne +
-		dec MapRAM.MinimapX
+		dec MinimapRAM.MinimapX
 	+
-	lda !ScrollX
+	lda ScrollX
 	bpl +
-		inc MapRAM.MinimapX
+		inc MinimapRAM.MinimapX
 	+
 	
 return:
 ; Place blip
 	lda #$03
-	sta MapRAM.BlipX
-	sta MapRAM.BlipY
+	sta MinimapRAM.BlipX
+	sta MinimapRAM.BlipY
 	
 	rts
 
 MapInputHandler:
-	lda !Joy1Change
-	and #(!Joy_Up | !Joy_Down | !Joy_Left | !Joy_Right)
+	lda Joy1Change
+	and #(Joy_Up | Joy_Down | Joy_Left | Joy_Right)
 	beq return1
 	
-	cmp #!Joy_Up
+	cmp #Joy_Up
 	bne +
-		ldx MapRAM.MinimapY	; Don't move up past edge of map
+		ldx MinimapRAM.MinimapY	; Don't move up past edge of map
 		beq +
-		dec MapRAM.MinimapY
-		inc MapRAM.BlipY
+		dec MinimapRAM.MinimapY
+		inc MinimapRAM.BlipY
 	+
-	cmp #!Joy_Down
+	cmp #Joy_Down
 	bne +
-		ldx MapRAM.MinimapY	; Don't move right past edge of map
+		ldx MinimapRAM.MinimapY	; Don't move right past edge of map
 		cpx #$1F
 		beq +
-		inc MapRAM.MinimapY
-		dec MapRAM.BlipY
+		inc MinimapRAM.MinimapY
+		dec MinimapRAM.BlipY
 	+
-	cmp #!Joy_Left
+	cmp #Joy_Left
 	bne +
-		ldx MapRAM.MinimapX	; Don't move up past edge of map
+		ldx MinimapRAM.MinimapX	; Don't move up past edge of map
 		beq +
-		dec MapRAM.MinimapX
-		inc MapRAM.BlipX
+		dec MinimapRAM.MinimapX
+		inc MinimapRAM.BlipX
 	+
-	cmp #!Joy_Right
+	cmp #Joy_Right
 	bne +
-		ldx MapRAM.MinimapX	; Don't move right past edge of map
+		ldx MinimapRAM.MinimapX	; Don't move right past edge of map
 		cpx #$1F
 		beq +
-		inc MapRAM.MinimapX
-		dec MapRAM.BlipX
+		inc MinimapRAM.MinimapX
+		dec MinimapRAM.BlipX
 	+
 	
 	jsr DrawMap
@@ -261,7 +261,7 @@ MapInputHandler:
 return1:
 ; Displaced
 ; Manual save button combo, change so it's in Controller 1
-	lda !Joy1Status		; Load buttons currently being pressed on joypad 1
+	lda Joy1Status		; Load buttons currently being pressed on joypad 1
 	and #$88		;
 	rts
 

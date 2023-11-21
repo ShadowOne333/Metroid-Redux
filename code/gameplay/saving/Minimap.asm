@@ -2,27 +2,12 @@
 ;	Other banks
 ;-------------------------------
 
-; Projectile animation frames
-%org($8BD1,1)	; 0x04BE1
-	db $01,$01,$05
-
+; Random unused table that Deejaynerate EA'd for some reason [possibly to make IPS peek analysis easier] (0.4 had it almost like vanilla but with EAs instead of zeros, though 0.3 *does* EA this too. probably drop this edit, it's stupid)
 %org($BF56,1)	; 0x07F66
-; NOP a whole section in this bank
+
 	%fillto($BFB0,1,$EA)
 
-;-------------------------------
-
-; Projectile animation frames
-%org($8BD1,2)	; 0x08BE1
-	db $01,$01,$05
-
-;-------------------------------
-
-; Projectile animation frames
-%org($8BD1,4)	; 0x10BE1
-	db $01,$01,$05
-
-;-------------------------------
+;-------------------------------------
 
 ; Enemy sprite drawing pointer tables
 %org($9E1B,4)	; 0x11E2B
@@ -211,12 +196,6 @@ l_A58E:
 	db $75,$51,$00,$7A,$01,$83,$45,$FF
 l_A5C6:
 	db $00,$1D
-
-;-------------------------------
-
-; Projectile animation frames?
-%org($8BD1,5)	; 0x14BE1
-	db $01,$01,$05
 
 ;-------------------------------
 ;	Tile patterns
@@ -1319,33 +1298,7 @@ l_84DF:	; $304EF
 
 	; Probably fill up to $30DA0 with 00s since it's most likely now unused space in Saving
 
-;-------------------------------
-
-%org($9000,14)	; 0x39010
-	lda #$00
-	sta $00
-	lda #$94
-	sta $01
-	lda #$00
-	sta $02
-	lda #$79
-	sta $03
-	ldx #$07
-	--
-		ldy #$00
-		-	
-			lda ($00),y
-			sta ($02),y
-			iny
-		bne -
-		inc $01
-		inc $03
-		dex
-	bne --
-	ldy #$00
-	jmp !ROMSwitch
-
-;-------------------------------
+;-------------------------------------
 
 %org($9400,14)	; 0x39410
 	db $FE,$FE,$FE,$FE,$FE,$FE,$FE,$FE
@@ -1496,42 +1449,6 @@ l_84DF:	; $304EF
 	db $FE
 
 ;-------------------------------------
-;	Japanese RNG code
-;-------------------------------------
-; This routine generates pseudo random numbers and updates those numbers every frame.
-; The random numbers are used for several purposes including password scrambling and determinig what items, if any, an enemy leaves behind after it is killed.
-%org($C000,15)	; 0x3C000
-RandomNumbers:
-	txa
-	pha
-; Modified code
-	lda $2F
-	beq +
-	asl
-	beq ++
-	bcc ++
-+	eor #$1D
-++	sta !RandomNumber2
-	eor #$F0
-	sta !RandomNumber1
-	pla
-	txa
-	lda !RandomNumber1
-	rts
-
-; Clear cartridge RAM at $6000-$7FFF
-%org($C057,15)	; 0x3C067
-; Clear RAM up to $7400 only?
-	ldy #$74	; High byte of start address (#$7F -> #$74)
-
-; Random number 2 initialization
-%org($C0AC,15)	; 0x3C0BC
-	lda #$11
-	sta !RandomNumber1	; Initialize RandomNumber1 to #$11
-	lda #$1D		; #$FF -> #$1D
-	sta !RandomNumber2	; Initialize RandomNumber2 to #$1D
-
-;-------------------------------------
 
 ; Main routine changes
 %org($C121,15)	; 0x3C131
@@ -1549,22 +1466,6 @@ RandomNumbers:
 %org($C1F7,15)	; 0x3C207
 ; Check if TitleRoutine is $17, if not then branch
 	cmp #$17	; #$15 -> #$17
-
-;-------------------------------------
-
-%org($C920,15)	; 0x3C930
-	jmp Section4	; Fast Doors fix routine
-
-; Overwrite NARPASSWORD subroutine from the main Game Engine section
-%org($C931,15)	; 0x3C941
-	jsr $E1F1
-	jsr $E1F1
-	nop #14
-l_C945:
-
-%org($C9B1,15)	; 0x3C9C1
-	jsr $7E18
-	nop
 
 ;-------------------------------------
 ; Changes to a modified AccessSavedGame routine from the original game. From $CA35 up to $CADA
@@ -1595,15 +1496,16 @@ l_CA45:
 ; Change the Display bar jump
 %org($CB57,15)	; 0x3CB67
 ; Jump to custom Minimap (minimappos.asm) routine
-	jsr Minimap	; Originally $E0C1 (DisplayBar)
+	jsr MinimapPos	; $7EA8, Originally $E0C1 (DisplayBar)
 
 ; Modify the Samus Run animation pointer
 %org($CC24,15)	; 0x3CC34
-	dw $7F30	; Originally $CCC2 (SamusRun)
+	dw l_7F30	; $7F30, Originally $CCC2 (SamusRun)
 
 ;-------------------------------------
 
 ; Modify the Break out of "Ball mode" routine
+; How high a ceiling above morphball can exist to trigger unmorphing (Morphball ceiling fix)
 %org($D0F5,15)	; 0x3D105
 	adc #$00	; #$08 -> #$00
 ; CHANGE MORPH BALL SO IT DOESN'T MAKE THE ROLL ANIM AUTOMATICALLY, AND ONLY ROLLS WHEN MOVING LEFT/RIGHT
@@ -1626,6 +1528,7 @@ l_CA45:
 ;	Item drop table
 ;-------------------------------------
 ;The following table determines what, if any, items an enemy will drop when it is killed.
+; Replaced one "no item" byte with a missile byte, increasing the drop rate of missiles
 %org($DE35,15)	; 0x3DE45
 ItemDropTbl:
 	db $80		;Missile.
@@ -1638,12 +1541,29 @@ ItemDropTbl:
 	db $80		;No item. ($89->$80)
 
 ;-------------------------------------
-%org($E154,15)	; 0x3E164
-	clc
+;	HUD Layout Positions
+;-------------------------------------
+
+; How many bytes from the DataDisplayTbl [3E1C9-3E1F0] to use (Each 4 bytes removed is one sprite removed from the HUD display, starting from the bottom of the table.
+; If this byte is not a multiple of 4, the game WILL crash. v0.4 did this to reduce sprite count to account for the minimap but ultimately the sprite flickering is rare enough to keep it vanilla.
+; If you really want to reduce sprite count through this, I'd recommend bringing it down to $14, keeping just the counter digits and one missile sprite/tile to distinguish the missile count from the energy count. It's ultimately whatever, though.)
+%org($E0CF,15)	; 0x3E0DF
+; 10*4. At end of DataDisplayTbl?
+; If not, loop to load next byte from table
+	cpy #$28	; cpy #$28, Recommended #$14
+
+
+%org($E153,15)	; 0x3E163
+	lda #$18	; X position of first HUD E-Tank sprite
+%org($E17B,15)	; 0x3E18B
+	lda #$17	; Y position of HUD E-Tank sprites
+
 
 %org($E18F,15)	; 0x3E19F
-	adc #$07
-
+; In what direction should succeeding E-Tanks should go relative to the first one (goes in tandem with 3E1A0)
+	db $69
+; X distance betweeen HUD E-Tank sprites relative to each other
+	db $07
 
 ;-------------------------------------
 ;	Status bar sprite data
@@ -1662,9 +1582,10 @@ DataDisplayTbl:
 	db $21,$7F,$01,$20	; N
 	db $21,$3A,$01,$28	; ... - Changed $00 to $01 to make "ENERGY" all blue
 
+; How many missiles you get from missile drops
+; NOTE: missile pickups work differently in Tourian/with Metroids, basically you get more missiles the more missile packs you have
 %org($F4B7,14)	; 0x3F4C7
-	lda #$05
-
+	lda #$05	; lda #$02
 
 ;-------------------------------
 

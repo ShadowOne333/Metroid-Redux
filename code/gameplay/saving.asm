@@ -46,51 +46,51 @@ incsrc "code/text/Text.tbl"
 ;-------------------------------------
 
 ; Existing vars (names generally taken from M1 disassembly)
-!Joy1Change	= $12	; Button newly pressed on this frame
-!Joy2Change	= $13	;
-!Joy1Status	= $14	; Buttons held this frame
-!Joy2Status	= $15	;
-!PalDataPending	= $1C	; Pending palette data. Palette # = PalDataPending - 1
-!TitleRoutine	= $1F	; Identifies which "mode" title screen is in (title screen uses a state machine)
-!Timer1		= $2A	; Timer. Decremented every frame if > 0.
-!Timer2		= $2B	; Timer. Decremented every frame if > 0.
-!Timer3		= $2C	; Timer. Decremented every 10 frames if > 0.
-!FrameCount	= $2D	; Increments every frame(overflows every 256 frames)
-!RandomNumber1	= $2E	; Random numbers used--> 
-!RandomNumber2	= $2F	; throughout the game.
-!GamePaused	= $31
-!ScrollDir	= $49
-!MapPosY	= $4F	; Current y position on world map.
-!MapPosX	= $50	; Current x position on world map.
-!SpritePagePos	= $5B	; Index into sprite RAM used to load object sprite data
-!InArea		= $74	; The area the player is in.
-!MaxEnergyPickup	= $94	; Maximum energy power-ups that can be picked up. Randomly recalculated whenever Samus goes through a door.
-!First4SlowCntr	= $BC	; This address holds an 8 frame delay. When the delay is up, the crosshair sprites double their speed.
-!SmallStringRam	= $C9	; Written to in title routine, but never accessed.
-!ScrollY	= $FC	; Y value loaded into scroll register. 
-!ScrollX	= $FD	; X value loaded into scroll register.
-!PPU2000_Cache	= $FF	; Zero-page variable that holds the value to be assigned to $2000
-!HealthLow	= $0106	; Health low byte (1's place in upper nibble, tenths in lower nibble)
-!HealthHigh	= $0107	; Health High byte (full tanks in upper nibble, 10's place in lower nibble)
-!MiniBossKillDelay	= $108
-!Sprite00RAM	= $0200
-!OAM_Y		= $0200
-!OAM_Tile	= $0201
-!OAM_Att	= $0202
-!OAM_X		= $0203
-!ObjVertSpeed	= $0308
-!ObjHorzSpeed	= $0309
-!StartContinue	= $0325	; 0=START selected, 1=CONTINUE selected.
-!MenuSelection	= $0325
-!TriangleSFXFlag	= $0683	; Flags which, when set, cause sound effects to play. Used to make sounds on new menus.
-!SaveFileIndex	= $6875	; $00, $20, or $40, "pointer" to selected save file
-!SaveFileNum	= $6876	; $00, $01, or $02, index of selected save file
-!SamusStat00	= $6876	; Unused memory address for storing Samus info.
-!TankCount	= $6877	; Number of energy tanks player has.
-!SamusGear	= $6878	; Bit field specifying which of 8 items samus has
-!MissileCount	= $6879	; Number of missiles player has.
-!MaxMissiles	= $687A	; Maximum number of missiles player can carry
-!PasswordBytes	= $6988	; Un-encoded password data
+Joy1Change	= $12	; Button newly pressed on this frame
+Joy2Change	= $13	;
+Joy1Status	= $14	; Buttons held this frame
+Joy2Status	= $15	;
+PalDataPending	= $1C	; Pending palette data. Palette # = PalDataPending - 1
+TitleRoutine	= $1F	; Identifies which "mode" title screen is in (title screen uses a state machine)
+Timer1		= $2A	; Timer. Decremented every frame if > 0.
+Timer2		= $2B	; Timer. Decremented every frame if > 0.
+Timer3		= $2C	; Timer. Decremented every 10 frames if > 0.
+FrameCount	= $2D	; Increments every frame(overflows every 256 frames)
+RandomNumber1	= $2E	; Random numbers used--> 
+RandomNumber2	= $2F	; throughout the game.
+GamePaused	= $31
+ScrollDir	= $49
+MapPosY	= $4F	; Current y position on world map.
+MapPosX	= $50	; Current x position on world map.
+SpritePagePos	= $5B	; Index into sprite RAM used to load object sprite data
+InArea		= $74	; The area the player is in.
+MaxEnergyPickup	= $94	; Maximum energy power-ups that can be picked up. Randomly recalculated whenever Samus goes through a door.
+First4SlowCntr	= $BC	; This address holds an 8 frame delay. When the delay is up, the crosshair sprites double their speed.
+SmallStringRam	= $C9	; Written to in title routine, but never accessed.
+ScrollY	= $FC	; Y value loaded into scroll register. 
+ScrollX	= $FD	; X value loaded into scroll register.
+PPU2000_Cache	= $FF	; Zero-page variable that holds the value to be assigned to $2000
+HealthLow	= $0106	; Health low byte (1's place in upper nibble, tenths in lower nibble)
+HealthHigh	= $0107	; Health High byte (full tanks in upper nibble, 10's place in lower nibble)
+MiniBossKillDelay	= $0108
+Sprite00RAM	= $0200
+OAM_Y		= $0200
+OAM_Tile	= $0201
+OAM_Att	= $0202
+OAM_X		= $0203
+ObjVertSpeed	= $0308
+ObjHorzSpeed	= $0309
+StartContinue	= $0325	; 0=START selected, 1=CONTINUE selected.
+MenuSelection	= $0325
+TriangleSFXFlag	= $0683	; Flags which, when set, cause sound effects to play. Used to make sounds on new menus.
+SaveFileIndex	= $6875	; $00, $20, or $40, "pointer" to selected save file
+SaveFileNum	= $6876	; $00, $01, or $02, index of selected save file
+SamusStat00	= $6876	; Unused memory address for storing Samus info.
+TankCount	= $6877	; Number of energy tanks player has.
+SamusGear	= $6878	; Bit field specifying which of 8 items samus has
+MissileCount	= $6879	; Number of missiles player has.
+MaxMissiles	= $687A	; Maximum number of missiles player can carry
+PasswordBytes	= $6988	; Un-encoded password data
 BankLock	= $6FF0
 RoomDataBanked	= $6FF1
 
@@ -112,11 +112,10 @@ struct SaveFiles $7500
 	.File_Checksum	skip 1	; The sum (truncated) of all previous file variables, used to verify the file.
 	.File_Checkxor	skip 1	; The value produced by xoring all file bytes together, excluding Checksum and Checkxor, used to verify the file.
 	.EndFile1:
-		!FileSize	= (SaveFiles.EndFile1-SaveFiles.File1)	; $20
-		!FileSize_NoChecksum	= !FileSize-2	; $1E
-	.File2:	skip $20	; !FileSize
 
-	.File3:	skip $20	; !FileSize
+	.File2:	skip $20	; FileSize
+
+	.File3:	skip $20	; FileSize
 
 ; General purpose vars
 	.localVar:	skip 1	; $7560, General use
@@ -131,50 +130,51 @@ struct SaveFiles $7500
 
 endstruct
 
-!FileIndex_1 = $00
-!FileIndex_2 = !FileSize
-!FileIndex_3 = !FileSize*2
+FileSize	= (SaveFiles.EndFile1-SaveFiles.File1)	; $20
+FileSize_NoChecksum	= FileSize-2	; $1E
+FileIndex_1	= $00
+FileIndex_2	= FileSize
+FileIndex_3	= FileSize*2
+
 
 ;-------------------------------------
 
 	; Constants
-!PasswordDataSize	=  $12	; Number of bytes is password data (see PasswordBytes)
-!Joy_Left	= $02	; Controller buttons
-!Joy_Right	= $01
-!Joy_Down	= $04
-!Joy_Up		= $08
-!MapLeft	= $64	; Map position on screen
-!MapTop		= $32
-!MapWidth	= 7	; Map size, in tiles
-!MapHeight	= 7
-!SamusBlipTile	= $BF
+PasswordDataSize	=  $12	; Number of bytes is password data (see PasswordBytes)
+Joy_Left	= $02	; Controller buttons
+Joy_Right	= $01
+Joy_Down	= $04
+Joy_Up		= $08
+MapLeft	= $64	; Map position on screen
+MapTop		= $32
+MapWidth	= 7	; Map size, in tiles
+MapHeight	= 7
+SamusBlipTile	= $BF
 
 	; Existing routines
-!UpdateSparkleSprites	= $87CF
-!CalculatePassword	= $8C7A	; Calculates the password
-!PasswordChecksum	= $8E21	; Store combined added value of -->
-!PasswordByte11		= $8E2D	; addresses $6988 thu $6998 in $6999.
-!ClearAll		= $909F	; Turn off screen, erase sprites and nametables
-!InitializeGame		= $92D4	; New Game
-!InitializeStats	= $932B	; Continue
-!PreparePPUProcess	= $9449	; Clears screen and writes "START CONTINUE".
-!PreparePPUProcess_	= $C20E
-!Adiv8			= $C2C0	; Divide by 8
-!Amul32			= $C2C4	; Multiply by 32
-!Amul16			= $C2C5	; Multiply by 16
-!ScreenOn		= $C447
-!NmiOn			= $C487	; Turn on VBlank interrupts
-!ROMSwitch		= $C4EF
-!SamusRun		= $CCC2
-!DisplayBar		= $E0C1
-!CheckMoveLeft		= $E880
-!CheckMoveRight		= $E88B
-!HexToDec		= $E198
-!Reset			= $FFB0
+UpdateSparkleSprites	= $87CF
+CalculatePassword	= $8C7A	; Calculates the password
+PasswordChecksum	= $8E21	; Store combined added value of -->
+PasswordByte11		= $8E2D	; addresses $6988 thu $6998 in $6999.
+ClearAll		= $909F	; Turn off screen, erase sprites and nametables
+PreparePPUProcess	= $9449	; Clears screen and writes "START CONTINUE".
+PreparePPUProcess_	= $C20E
+Adiv8			= $C2C0	; Divide by 8
+Amul32			= $C2C4	; Multiply by 32
+Amul16			= $C2C5	; Multiply by 16
+ScreenOn		= $C447
+NmiOn			= $C487	; Turn on VBlank interrupts
+ROMSwitch		= $C4EF
+SamusRun		= $CCC2
+DisplayBar		= $E0C1
+CheckMoveLeft		= $E880
+CheckMoveRight		= $E88B
+HexToDec		= $E198
+Reset			= $FFB0
 
 ; Map data and 
-!MapRAM			= $7900	; Address of 
-!MapData		= $9400	; Address of map data in bank $E
+MapRAM			= $7900	; Address of 
+MapData		= $9400	; Address of map data in bank $E
 
 ;if (<MapRam) != $00
 	;.error MapRAM must begin on a $100 byte boundary 
@@ -187,6 +187,9 @@ endstruct
 incsrc "saving/FileSaveLoad.asm"
 incsrc "saving/Map_ROM.asm"
 incsrc "saving/wavyIce.asm"
+incsrc "saving/FastDoors.asm"
+incsrc "saving/MissileDoors.asm"
+incsrc "saving/RNG.asm"
 
 ;-------------------------------------
 ;	RAM executed code

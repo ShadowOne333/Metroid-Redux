@@ -3,15 +3,15 @@
 
 MapLoadEntryPoint:
 	; Pointer to map data in ROM
-	lda.b #!MapData
+	lda.b #MapData
 	sta $00
-	lda.b #!MapData>>8
+	lda.b #MapData>>8
 	sta $01
 
 	; Pointer to RAM it will be copied to
-	lda.b #!MapRAM
+	lda.b #MapRAM
 	sta $02
-	lda.b #!MapRAM>>8
+	lda.b #MapRAM>>8
 	sta $03
 
 	; Copy 6 blocks of $100 bytes
@@ -35,10 +35,10 @@ MapLoadEntryPoint:
 
 ; We now return you to your normal intialization routine
 	ldy #$00
-	jmp !ROMSwitch
+	jmp ROMSwitch
     
     
-%org($C123,15)	; 0x00010 Bank $0E
+%org($C123,15)	; 0x3C133 Bank $0E
 ;.PATCH 0F:C123
 ; This hijack runs our map setup when start is pressed
 ;    LC123: cmp #$05	    ; Are we currently paused?
@@ -85,7 +85,7 @@ BC130:	nop
 ;LC137:	sta GamePaused		;
 ;LC139:	jsr PauseMusic		;($CB92)Silences music while game paused.
 
-%org($C9B1,15)	; 0x00010 Bank $0F
+%org($C9B1,15)	; 0x3C9C1 Bank $0F
 ;.PATCH 0f:C9B1
 ; Handle map scrolling controls during pause
 	jsr MapInputHandler

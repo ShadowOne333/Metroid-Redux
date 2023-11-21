@@ -6,6 +6,11 @@
 ; Metroid mother hack originally made by dACE, which combines hacks like Metroid+Saving (snarfblam), Roidz (DemickXII) and MDbtroid (Infinity's End)
 ; Disassembly by ShadowOne333
 
+LoadGFX7	= $C601	; LoadGFX7 (THE NEW VERSION for enhanced ROMs)
+
+;-------------------------------
+;	Include Text TBL file
+;-------------------------------
 incsrc "code/text/Text.tbl"
 
 ;-------------------------------------------------------------------
@@ -64,6 +69,7 @@ incsrc "code/text/Text.tbl"
 	;Writes some blank spaces in row $20A0 (6th row from top).
 	db $20,$A8,$4F	; PPU address and length
 	db $FF		;Since RLE bit set, repeat 16 blanks starting at $20A8.
+
 ;-------------------------------
 ; Title Screen's "METROID" tilemap data for layout and positioning
 	db $21,$03,$1C	; PPU address and length
@@ -108,21 +114,34 @@ incsrc "code/text/Text.tbl"
 	db $FF,$FF
 
 	;Writes "MOTHER" graphics in row $21C0 (15th row from top).
+	; Removed "MOTHER" so it only reads "METROID" at title screen
 	db $21,$C3,$1A	; PPU address and length
 	db $FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF
 	db $FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF
 	db $FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF
-	db $FF,$FF													
+	db $FF,$FF
+
+;-------------------------------------------------------------------
+%org($86F4,0)	; 0x00704
+	%fillto($871E,0,$FF)
+
+; Unused area!
+	%fillto($8759,0,$FF)
+	db "ERROR TRY AGAIN"
+
 ;-------------------------------------
 
-%org($851B,0)	; 0x0034A
+%org($851B,0)	; 0x0350B
 	db $BF		; Change copyright symbol tile number
 
 %org($9124,0)	; 0x01134
-	jsr $C601	; $C6D6, Loads font for the password
+	jsr LoadGFX7	; LoadGFX7 (THE NEW VERSION for enhanced ROMs)
 
 %org($9314,0)	; 0x01324
 	nop #3		; Overwrite a jsr to load Samus GFX into pattern table
+
+%org($93A8,0)	; 0x013B8
+	jsr LoadGFX7	; LoadGFX7 (THE NEW VERSION for enhanced ROMs)
 
 ;-------------------------------------
 ;	Change Samus' sprite tables
@@ -138,11 +157,14 @@ incsrc "code/text/Text.tbl"
 	db $F8
 ; Bikini Samus
 %org($9E8D,0)	; 0x01E9D
-	db $42 : skip 1 : db $F8 : skip 8 : db $F8 : skip 3 : db $46
+	db $42,$78,$F8 : skip 8
+	db $F8,$45,$70,$BB,$46,$78,$BB,$48
+
 ;-------------------------------------
 ; Change palettes regarding Samus in the ending (EndGamePal00)
 %org($9FB1,0)	; 0x01FC1
-	db $26 : skip 2 : db $16,$28
+	db $26,$0F,$36,$16,$28
+
 ;-------------------------------------
 ; Change ground graphics writes in the ending
 ;-------------------------------------
@@ -200,12 +222,12 @@ incsrc "code/text/Text.tbl"
 
 ; Pointer changes to sprite drawing stuff (Animations?)
 %org($86C1,1)	; 0x046D1
-	dw $8AC4
+	dw l_8AC4	; Kraid Statue
 %org($86D5,1)	; 0x046E5
-	dw $8AA1,$8AB6
+	dw l_8AA1,l_8AB6	; Pointers to unused sprite frame data
 ; Pointer change for placement of sprites for Samus' body and enemies
 %org($86FB,1)	; 0x0470B
-	dw $8ACD
+	dw l_8ACD	; Pointer to a later section of Kraid's statue?
 
 ;-------------------------------------
 ; Sprite frame data table changes
@@ -218,17 +240,25 @@ incsrc "code/text/Text.tbl"
 
 ; Rewrite unused sprite frame entry
 %org($8AA1,1)	; 0x04AB1
+l_8AA1:
 	db $1E,$00,$08
 	db $F5,$F6,$F7,$FA,$FB,$FC
 	db $08,$04,$C5,$C6,$C7
 	db $D5,$D6,$D7,$E5,$E6,$E7,$FF
+
 ; Rewrite Kraid Statue sprite entry
+l_8AB6:
 	db $1E,$00,$08
 	db $F5,$F6,$F7,$FA,$FB,$FC
 	db $08,$04,$C5,$C6,$C7
+l_8AC4:
 	db $D5,$D6,$D7,$E5,$E6,$E7,$FF
+
 ; Rewrite Ridley Statue sprite entry
-	db $1E,$00,$08
+
+	db $1E,$00
+l_8ACD:
+	db $08
 	db $F8,$F9,$FE,$FA,$FB,$FC
 	db $00,$04,$C8,$C9,$FE
 	db $D8,$D9,$EA,$E8,$E9,$EB,$FF

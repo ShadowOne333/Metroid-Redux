@@ -7,7 +7,7 @@ FileIndexList:
 ; Used to retrieve file index for a given save file number
 ; File Index 1, 2, 3
 	;	$00,	   $20,		$40
-	db !FileIndex_1,!FileIndex_2,!FileIndex_3
+	db FileIndex_1,FileIndex_2,FileIndex_3
 
 InitFileDisplay:
 ; Verifies files are valid, then draws the file menu.
@@ -29,14 +29,14 @@ InitFileDisplay:
 
 ; Init menu variables
 	ldy #$00
-	sty !MenuSelection	; MenuSelection = 0
+	sty MenuSelection		; MenuSelection = 0
 	sty SaveFiles.DeleteMode	; DeleteMode = false
 	dey
 	sty SaveFiles.CursorDisplayX	; CursorDisplayX/Y are set to FF (lower-right
 	sty SaveFiles.CursorDisplayY	; corner). This causes the cursor to zip into place when the menu is shown.
 
         ;return from hijack
-	jmp !ScreenOn		
+	jmp ScreenOn		
 
 VerifyFile:
 ; Verifies a single file, sets it to empty if the file is not valid.
@@ -44,7 +44,7 @@ VerifyFile:
 ; y [in] file num
 	lda FileIndexList,y	; Custom table
 	tax
-	stx !SaveFileIndex
+	stx SaveFileIndex
 
 ; If file is not in use, don't bother verifying
 	lda SaveFiles.File_InUse,x
@@ -52,13 +52,13 @@ VerifyFile:
 
 ; Verify checksum 
 	jsr GetFileSum		; Get checksum
-	ldx !SaveFileIndex	; Get file index
+	ldx SaveFileIndex	; Get file index
 	cmp SaveFiles.File_Checksum,x	; Compare to stored checksum
 	bne ClearFile		; Mark file unused if checksum invalid
 
 ; Verify check XOR
 	jsr GetFileXor		; Get checkxor
-	ldx !SaveFileIndex	; Get file index
+	ldx SaveFileIndex	; Get file index
 	cmp SaveFiles.File_Checkxor,x	; Compare to stored checkxor
 	beq Exit		; Mark file unused if checkxor invalid
 
@@ -75,7 +75,7 @@ GetFileSum:	; $BE28
 ; x [in]    File index
 ; a [out]   Sum
 	lda #$00
-	ldy.b #!FileSize_NoChecksum
+	ldy #FileSize_NoChecksum
 	-	clc
 		adc SaveFiles.File_InUse,x
 		inx
@@ -85,7 +85,7 @@ GetFileSum:	; $BE28
 
 GetFileXor:	; $BE35
 	lda #$00
-	ldy.b #!FileSize_NoChecksum
+	ldy #FileSize_NoChecksum
 	-	clc
 		eor SaveFiles,x
 		inx
@@ -97,13 +97,13 @@ InitializeStats_InitHealth:	; $BE42
 ; Extends InitializeStats to set initial health value to 30
 ; (This used to be done in SamusInit which is called by GoMainRoutine)
 	lda #$03
-	sta !HealthHigh
+	sta HealthHigh
 	lda #$00
-	sta !HealthLow
+	sta HealthLow
 
 	; displaced code:
         ;LDA #$00			        ;A already 0
-	sta !SamusStat00	; $6876
+	sta SamusStat00	; $6876
 	rts
 
 FileBlankStrings:	; $BE50
@@ -140,7 +140,7 @@ LoadMapHijack:
 	lda.b #(MapLoadEntryPoint-1)		; #$FF
 	pha
 	ldy #$0E
-	jmp !ROMSwitch
+	jmp ROMSwitch
 
 RenderFile:
 ; Draws a save file to the file menu
@@ -153,8 +153,8 @@ RenderFile:
 
 	lda FileIndexList,y	; Get and store file
 	tax
-	stx !SaveFileIndex
-	sty !SaveFileNum
+	stx SaveFileIndex
+	sty SaveFileNum
 	;y *= 2 (pointer table index)
 	tya
 	asl
@@ -162,17 +162,17 @@ RenderFile:
 	sty SaveFiles.localVar2
 	lda SaveFiles.File_InUse,x	; If file is empty, blank it out 
 	bne RenderUsedFile
-		jmp RenderEmptyFile	; Jump to new code
+	jmp RenderEmptyFile	; Jump to new code
 
 RenderUsedFile:
 ; Start by drawing all possible equipment, then blank out equipment player doesn't have
 	ldx FileItemStrings,y
 	lda FileItemStrings+1,y
 	tay
-	jsr !PreparePPUProcess_
+	jsr PreparePPUProcess_
 
 	ldy SaveFiles.localVar2
-	ldx !SaveFileIndex
+	ldx SaveFileIndex
 	lda SaveFiles.File_SamusGear,x
 	sta SaveFiles.localVar3
 
@@ -185,37 +185,37 @@ RenderUsedFile:
 		bne skipItem		; Don't blank it out if player has it.
 			ldy SaveFiles.localVar2	; Get ptr table index
 			lda ItemPPUAddresses+1,y	; PPU Dest High
-			sta !SmallStringRam
+			sta SmallStringRam
 			lda SaveFiles.localVar	; PPU Dest Low (3 * item_index + base_address)
 			asl		; item index * 2
 			clc
 			adc SaveFiles.localVar	; + item index
 			adc ItemPPUAddresses,y	; + base address
-			sta !SmallStringRam+1
+			sta SmallStringRam+1
 			lda #$42	; PPU Length byte (two tiles, RLE)
-			sta !SmallStringRam+2
+			sta SmallStringRam+2
 			lda #$FF	; PPU tiles: FF (blank)
-			sta !SmallStringRam+3
+			sta SmallStringRam+3
 			lda #$00	; End of data
-			sta !SmallStringRam+4
+			sta SmallStringRam+4
 
 		; Load to PPU
-			ldx #!SmallStringRam
+			ldx #SmallStringRam
 			ldy #$00
-			jsr !PreparePPUProcess_
+			jsr PreparePPUProcess_
 
 		; Create PPU string to clear bottom 2 tiles
 		; (use same string, but add $20 to ppu dest for next row)
 			lda #$20
 			clc
-			adc !SmallStringRam+1
-			sta !SmallStringRam+1
+			adc SmallStringRam+1
+			sta SmallStringRam+1
 			bcc ++		; Carry
-				inc !SmallStringRam
+				inc SmallStringRam
 		; Load to PPU
-		++	ldx #!SmallStringRam
+		++	ldx #SmallStringRam
 			ldy #$00
-			jsr !PreparePPUProcess_
+			jsr PreparePPUProcess_
 
 skipItem:
 		dec SaveFiles.localVar
@@ -223,32 +223,32 @@ skipItem:
 	
 BlankTanks:
 ; 8 tanks are currently shown. Blank enough to show correct amt
-	ldx !SaveFileIndex	; Get tank count
+	ldx SaveFileIndex	; Get tank count
 	lda SaveFiles.File_Tanks,x
 	sta SaveFiles.localVar
 
 	ldy SaveFiles.localVar2		; Get PPU address of tanks
 	lda TankPPUAddresses+1,y		; PPU dest high
-	sta !SmallStringRam
+	sta SmallStringRam
 	lda TankPPUAddresses,y	; PPU dest low
 	clc
 	adc SaveFiles.localVar		; + tank count (leave this many tanks)
-	sta !SmallStringRam+1
+	sta SmallStringRam+1
 
 	lda #$48		; 8 tiles, RLE
 	sec
 	sbc SaveFiles.localVar		; - tank count
-	sta !SmallStringRam+2
+	sta SmallStringRam+2
 
 	lda #$FF		; FF = blank tiles
-	sta !SmallStringRam+3
+	sta SmallStringRam+3
 
 	cmp #$40		; If player has 8 tanks, there is nothing to blank out. Move on to next thing.
 	beq DontBlankTanks
 
-	ldx #!SmallStringRam
+	ldx #SmallStringRam
 	ldy #$00
-	jsr !PreparePPUProcess_
+	jsr PreparePPUProcess_
 
 DontBlankTanks:
 ShowMissiles:
@@ -256,25 +256,25 @@ ShowMissiles:
 	lda TankPPUAddresses,y
 	clc
 	adc #$0B
-	sta !SmallStringRam+1
+	sta SmallStringRam+1
 
-	ldx !SaveFileIndex	; Get missile count, convert to decimal
+	ldx SaveFileIndex	; Get missile count, convert to decimal
 	lda SaveFiles.File_Missiles,x
-	jsr !HexToDec
+	jsr HexToDec
 
 	ldx #$03		; Insert into PPU string
 	jsr AddDecimalToPpuString
 
 	lda #$F6		; Insert slash
-	sta !SmallStringRam,x
+	sta SmallStringRam,x
 	inx
 
 	txa			; Remember our place
 	pha
 
-	ldx !SaveFileIndex	; Get missile capacity, convert to decimal
+	ldx SaveFileIndex	; Get missile capacity, convert to decimal
 	lda SaveFiles.File_MissileMax,x
-	jsr !HexToDec
+	jsr HexToDec
 
 	pla			; Back to our PPU string
 	tax
@@ -282,15 +282,15 @@ ShowMissiles:
 	jsr AddDecimalToPpuString	; Insert missile capacity into string
 
 	lda #$00		; Add our zero terminator
-	sta !SmallStringRam,x
+	sta SmallStringRam,x
 
 	lda #$07		; string size is 7 (two 3-digit nums + slas)
-	sta !SmallStringRam+2
+	sta SmallStringRam+2
 
 ; Load to PPU
-	ldx #!SmallStringRam
+	ldx #SmallStringRam
 	ldy #$00
-	jsr !PreparePPUProcess_
+	jsr PreparePPUProcess_
 
 	rts
 
@@ -299,7 +299,7 @@ RenderEmptyFile:	; $AA57
 	ldx FileBlankStrings,y
 	lda FileBlankStrings+1,y
 	tay
-	jsr !PreparePPUProcess_
+	jsr PreparePPUProcess_
 	rts
 
 AddDecimalToPpuString:	; $AA62
@@ -311,17 +311,17 @@ AddDecimalToPpuString:	; $AA62
 	lda $02		; 100 place
 	bne +
 		lda #$FF	; Don't show digit if 0
-+	sta !SmallStringRam,x
++	sta SmallStringRam,x
 
 	lda $01		; 10 place
 	bne +		; Show if not zero
 		tay		; Show if zero but 100s place is non-zero
 	bne +
 		lda #$FF	; Don't show digit 
-+	sta !SmallStringRam+1,x
++	sta SmallStringRam+1,x
 
 	lda $00		; 1 place (always show, even if 0)
-	sta !SmallStringRam+2,x
+	sta SmallStringRam+2,x
 
 ; Update pointer to name table string
 	inx
@@ -331,62 +331,62 @@ AddDecimalToPpuString:	; $AA62
 	rts
 
 SaveGame:	; $AA7D
-	jsr !CalculatePassword	; Create save data
+	jsr CalculatePassword	; Create save data
 
-	ldx !SaveFileIndex	; Mark file as in-use
+	ldx SaveFileIndex	; Mark file as in-use
 	lda #$01
 	sta SaveFiles.File_InUse,x
 
-	lda !SamusGear		; Save equipment, area, health for menu display 
+	lda SamusGear		; Save equipment, area, health for menu display 
 	sta SaveFiles.File_SamusGear,x
-	lda !TankCount
+	lda TankCount
 	sta SaveFiles.File_Tanks,x
-	lda !MissileCount
+	lda MissileCount
 	sta SaveFiles.File_Missiles,x
-	lda !MaxMissiles
+	lda MaxMissiles
 	sta SaveFiles.File_MissileMax,x
-	lda !InArea
+	lda InArea
 	and #$0F		; Only need lower nibble of area
 
 	sta SaveFiles.File_Area,x
-	lda !HealthLow
+	lda HealthLow
 	sta SaveFiles.File_Health,x
-	lda !HealthHigh
+	lda HealthHigh
 	sta SaveFiles.File_Health+1,x
 
 	lda #$11		; Copy the $12 bytes of password data
 	tay			; ($11 to $00)
 	clc
-	adc !SaveFileIndex
+	adc SaveFileIndex
 	tax			; Index into corresponding save file bytes
 
 	ldy #$11
-	-	lda !PasswordBytes,y
+	-	lda PasswordBytes,y
 		sta SaveFiles.File_PassData,x
 		dex
 		dey
 	bpl -
 
-	ldx !SaveFileIndex	; Calculate and save checksums
+	ldx SaveFileIndex	; Calculate and save checksums
 	jsr GetFileSum
-	ldx !SaveFileIndex	; (X overwritten by checksum routine)
+	ldx SaveFileIndex	; (X overwritten by checksum routine)
 	sta SaveFiles.File_Checksum,x
 	jsr GetFileXor
-	ldx !SaveFileIndex	; (X overwritten by checkxor routine)
+	ldx SaveFileIndex	; (X overwritten by checkxor routine)
 	sta SaveFiles.File_Checkxor,x
 
 	rts
 
 LoadGame:
-	ldx !SaveFileIndex	; If file is empty, start a new game
+	ldx SaveFileIndex	; If file is empty, start a new game
 	lda SaveFiles.File_InUse,x
 	bne +
 		jmp InitializeStats
 
 +	lda SaveFiles.File_Health,x	; Load player health
-	sta !HealthLow
+	sta HealthLow
 	lda SaveFiles.File_Health+1,x
-	sta !HealthHigh
+	sta HealthHigh
 
 	txa			; Copy 12 password data bytes
 	clc
@@ -394,78 +394,78 @@ LoadGame:
 	tax
 	ldy #$11
 	-	lda SaveFiles.File_PassData,x
-		sta !PasswordBytes,y
+		sta PasswordBytes,y
 		dex
 		dey
 	bpl -
 
-	lda !PPU2000_Cache	; Switch to nametable 0 (or else glitches)
+	lda PPU2000_Cache	; Switch to nametable 0 (or else glitches)
 	and #$FE
-	sta !PPU2000_Cache
+	sta PPU2000_Cache
 	
 	jmp InitializeGame		; Continue (initialize game with password data)
 
 BeepSound:	; $AB0E
 ; Beeps
-	lda !TriangleSFXFlag
+	lda TriangleSFXFlag
 	ora #$08
-	sta !TriangleSFXFlag
+	sta TriangleSFXFlag
 	rts
 
 GulpSound:	; $AB17
 ; Gulps
-	lda !TriangleSFXFlag
+	lda TriangleSFXFlag
 	ora #$04
-	sta !TriangleSFXFlag
+	sta TriangleSFXFlag
 	rts
 
 CheckMenuUpDown:	; $AB20
 ; Processes menu item selection (up, down, delete mode activation/cancelation)
-	lda !Joy1Change
+	lda Joy1Change
 	and #$0C
 	beq NoUpDown
 
 	cmp #$04	; Down?
 	bne +
-	inc !MenuSelection	;   Move to next selection (wrap from 3 to 0)
+	inc MenuSelection	;   Move to next selection (wrap from 3 to 0)
 	jsr BeepSound
 	jmp TruncateAndReturn
 
 +			; Up
-	inc !MenuSelection	; Move forward 3 menu selections
-	inc !MenuSelection	; (Since there are 4 options, we'll have
-	inc !MenuSelection	; wrapped back to previous selection)
+	inc MenuSelection	; Move forward 3 menu selections
+	inc MenuSelection	; (Since there are 4 options, we'll have
+	inc MenuSelection	; wrapped back to previous selection)
 	jsr BeepSound
 
 TruncateAndReturn:	; $AB3F
 	lda #$03	; Wrap around (from last item to first or vice-versa)
-	and !MenuSelection
-	sta !MenuSelection
+	and MenuSelection
+	sta MenuSelection
 
 NoUpDown:
 ; Pressing A, B, or select cancels erase mode and moves cursor off "ERASE"
-	lda !Joy1Change
+	lda Joy1Change
 	and #$E0
 	beq +
 		lda #$00
 		sta SaveFiles.DeleteMode
 
-		lda !MenuSelection	; If "ERASE" selected, move to irst item
+		lda MenuSelection	; If "ERASE" selected, move to irst item
 		cmp #$03
 		bne +
 			lda #$00
-			sta !MenuSelection
+			sta MenuSelection
 	+
 
 ; Pressing start while "ERASE" is selected enters erase mode
-	lda !Joy1Change
+	lda Joy1Change
 	and #$90	; Was start or A pressed?
 	beq +
-	lda !MenuSelection	; Was "ERASE" selected?
+	lda MenuSelection	; Was "ERASE" selected?
 	cmp #$03
 	bne +
 		lda #$00	 ; Select File 1
-		sta !MenuSelection
+		sta MenuSelection
 		lda #$03
 		eor SaveFiles.DeleteMode 	; Toggle Deletion mode
 		sta SaveFiles.DeleteMode 
@@ -476,7 +476,7 @@ NoUpDown:
 
 UpdateFileCursor:	; $AB7C
 ; Updates cursor display position for "gliding" effect
-	ldy !MenuSelection	; Get cursor position based on currently selected item
+	ldy MenuSelection	; Get cursor position based on currently selected item
 	lda CursorPositionX,y
 	sta SaveFiles.CursorX
 	lda CursorPositionY,y
@@ -542,9 +542,9 @@ DoneDrawing:
 ResetTitleAnimation:	; $ABEF
 ; Resets title screen animation instead of displaying your "mission"
 	lda #$04
-	sta !TitleRoutine
+	sta TitleRoutine
 	lda #$20	; Set timer delay for METROID flash effect.-->
-	sta !Timer3	;Delays flash by 320 frames (5.3 seconds).
+	sta Timer3	;Delays flash by 320 frames (5.3 seconds).
 	rts
 
 endSection2:
@@ -569,50 +569,50 @@ CursorPositionY:	; $946C
 
 UpdateGameOverScreen:
 
-	lda !Joy1Change
+	lda Joy1Change
 	and #$0C	; Read only inputs for D-Pad Up or Down
 	beq EndUpDown	; Is the player pressing up or down?
 		cmp #$08	; Check if button press is Up
 		bne +		; Up:
-			dec !MenuSelection	; Previous item
+			dec MenuSelection	; Previous item
 			bpl Beep	; Wrap from first to last
 			lda #$02
-			sta !MenuSelection
+			sta MenuSelection
 			bne Beep	; (branch always)
 
 		+		;   Down:
-		inc !MenuSelection	; Next item
+		inc MenuSelection	; Next item
 
-		lda !MenuSelection
+		lda MenuSelection
 
 		cmp #$03	; Wrap from last to first
 		bne Beep
 		lda #$00
-		sta !MenuSelection
+		sta MenuSelection
 
 Beep:
 	jsr BeepSound
 
 EndUpDown:
-	lda !Joy1Change
+	lda Joy1Change
 	and #$90	; Pressing Start or A?
 	beq ShowCursor
-		dec !MenuSelection	; Continue?
+		dec MenuSelection	; Continue?
 		bpl +
 			jmp InitializeGame	; Continue. (Not sure whether I should jmp or jsr, but either one seams to leave stack balanced)
 		+
-		dec !MenuSelection	; Save or Quit:
+		dec MenuSelection	; Save or Quit:
 		bpl +			; Don't save if player selected quit
 			jsr SaveGame
 		+
-			jmp !Reset	; Soft reset if player picked save or quit
+			jmp Reset	; Soft reset if player picked save or quit
 
 ShowCursor:
 	lda #$68
 	sta $0203		; X
-	ldy !MenuSelection
+	ldy MenuSelection
 	lda GameOverCursorY,y	; Y
-	sta !Sprite00RAM
+	sta Sprite00RAM
 	lda #$6F		; Tile
 	sta $0201
 	lda #$03
@@ -672,27 +672,6 @@ GameOverMenuStrings:	; $94DD
 
 Section3End:
 	nop
-
-; -----------------------------------------
-;		Section 4
-; -----------------------------------------
-; Fast Doors routine. Modified to fix palette loading
-%org($FFD5,15)	; 0x3FFE5, Bank $0F
-Section4:
-        ;FFD5 - FFF9        
-CheckMinHealth:
-	lda !HealthHigh	; Exit if health (including full tanks) >= 30, supposed to be $6877 (!TankCount) but it's $0107 in the source code
-	jsr !Amul16	; cmp #$03
-	ora #$09	;
-	;bcs +
-		;lda #$03
-		sta !HealthHigh
-		lda #$99	;lda #$00
-		sta !HealthLow
-        ;+
-        rts
-	nop
-EndSection4:
 
 ; -----------------------------------------
 ;		Section 5
@@ -799,11 +778,11 @@ EndFileSCreenItemStrings:
 ; Initialize file selection mode
 ; (this replaces the routine that used to clear screen and draw "START" and "CONTINUE")
 	ldy #$00
-	sta !MenuSelection
-	sta !SaveFileNum
-	sta !SaveFileIndex
+	sta MenuSelection
+	sta SaveFileNum
+	sta SaveFileIndex
 	lda #$16
-	sta !TitleRoutine
+	sta TitleRoutine
 	rts : nop
 
 
@@ -814,14 +793,14 @@ EndFileSCreenItemStrings:
 ; Rewrite of the start-button-handler (prev. for "START"/"CONTINUE") to
 ; Load/Erase a file
 ChooseStartContinue:
-	lda !Joy1Change
+	lda Joy1Change
 	and #$90	; Read inputs for Start and A buttons only
 	beq +		; Start or A pressed?
-		lda !MenuSelection	; Get file num and index
+		lda MenuSelection	; Get file num and index
 		tay
-		sty !SaveFileNum
+		sty SaveFileNum
 		ldx FileIndexList,y
-		stx !SaveFileIndex
+		stx SaveFileIndex
 
 		cmp #$03
 		beq +
@@ -833,7 +812,7 @@ ChooseStartContinue:
 	EraseFile:
 		lda #$00
 		sta SaveFiles.File_InUse,x
-		jmp !Reset
+		jmp Reset
 	+
 
 	jsr CheckMenuUpDown
@@ -858,7 +837,7 @@ endChooseStartContinue:
 
 %org($8000,0)	; 0x00010
 ; Only listen for start-button BEFORE crosshair animation (a new routine handles input for file menu)
-	lda !TitleRoutine
+	lda TitleRoutine
 ; Change the branch target to include the call to RemoveIntroSprites when start is pressed. 
 ; This needs to be called now since the sparkle animation may be in progress when start is pressed
 	cmp #$07		; If title not running, branch
@@ -868,7 +847,7 @@ endChooseStartContinue:
 %org($801C,0)	; 0x00678
 ; When start is pressed, begin the crosshair animation, which will then move on to file menu
 	lda #$07
-	sta !TitleRoutine
+	sta TitleRoutine
 	nop #2
 notTitle:
 
@@ -877,31 +856,31 @@ notTitle:
 ; Instead of fading out the story (now the file menu) after a delay, we want to go to file selection mode
 MessageFadeIn:
 	lda #$16		; lda #$30 -> #$16
-	sta !TitleRoutine	; !Timer3 -> !TitleRoutine
+	sta TitleRoutine	; Timer3 -> TitleRoutine
 	rts			; inc #$1F -> rts : nop
 	nop
 
 
 %org($9359,0)	; 0x01369
 DisplayPassword:	; Repurposed to draw the game over menu.
-	jsr !CalculatePassword	; Calculate Password
-	jsr !ClearAll		; ClearAll
+	jsr CalculatePassword	; Calculate Password
+	jsr ClearAll		; ClearAll
 
-	ldx #!SmallStringRam+4	; #<GameOverMenuStrings
-	ldy #!MaxEnergyPickup	; #>GameOverMenuStrings
-	jsr !PreparePPUProcess	; PreparePpuProcess
+	ldx #SmallStringRam+4	; #<GameOverMenuStrings
+	ldy #MaxEnergyPickup	; #>GameOverMenuStrings
+	jsr PreparePPUProcess	; PreparePpuProcess
 
 	jsr $C601		; LoadGFX7 (THE NEW VERSION for enhanced ROMs)
-	jsr !NmiOn		; NmiOn
+	jsr NmiOn		; NmiOn
 	jsr $C32C		; WaitNMIPass
 	lda #$0C
-	sta !PalDataPending	; PalDataPending
-	inc !TitleRoutine
+	sta PalDataPending	; PalDataPending
+	inc TitleRoutine
 
 	lda #$00
-	sta !MenuSelection
+	sta MenuSelection
 
-	jmp !ScreenOn
+	jmp ScreenOn
 
 EndOfDisplayPassword:
 
@@ -917,7 +896,7 @@ EndOfDisplayPassword:
 ClearSamusStats:
 	ldy #$07
 	lda #$00
-	-	sta !MiniBossKillDelay,y
+	-	sta MiniBossKillDelay,y
 		dey
 		bpl -
 	rts
@@ -942,21 +921,21 @@ InitializeStats:
 ; Nix "game over" screen, since the password screen (which is now our game over menu) already informs you the game is over
 GameOver:
 	lda #$19
-	sta !TitleRoutine
+	sta TitleRoutine
 	rts
 
 
-%org($8E1D,0)	; 0x0E2D
+%org($8E1D,0)	; 0x00E2D
 ; This was located at $8E17 originally for Saving v0.2
 ; Remove password scrambling
 PasswordChecksumAndScramble:
-	jsr !PasswordChecksum
-	sta !PasswordByte11
+	jsr PasswordChecksum
+	sta PasswordByte11
 	rts	; NO Scrambling
 	nop #3
+; All this is just an NOP in Saving 0.5.2, requires a check
 
-
-%org($8D0C,0)	; 0x0D1C
+%org($8D0C,0)	; 0x00D1C
 ; Remove call to LoadPasswordChar
 	jmp PasswordChecksumAndScramble	; Originally jsr $8E17
 
@@ -969,16 +948,16 @@ PasswordChecksumAndScramble:
 %org($80FF,0)	; 0x0010F
 ; Reduce the delay before METROID fades in
 	lda #$04	; lda #$08 -> #$04
-	sta !Timer3
+	sta Timer3
 	nop		 ; This NOP replaces LSR that is meant to change A from 8 to 4
 
 
 %org($8172,0)	; 0x00182
 ; Reduce the delay before the crosshair animation
 	lda #$08
-	sta !First4SlowCntr	; First4SlowCntr
+	sta First4SlowCntr	; First4SlowCntr
 	lda #$00
-	sta !Timer3
+	sta Timer3
 
 
 %org($8165,0)	; 0x00175
@@ -997,7 +976,7 @@ PasswordChecksumAndScramble:
 
 ;-----------------------------------------
 
-%org($8668,0)	; 0x0678
+%org($8668,0)	; 0x00678
 ; Replaces "EMERGENCY ORDER" text with file menu
 FileScreenStrings:
 	db $24,$86,$0B	; PPU Address and length

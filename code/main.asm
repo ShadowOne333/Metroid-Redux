@@ -5,7 +5,9 @@
 
 arch snes.cpu	; Set processor architecture (SNES)
 norom		; Change to 'norom' to allow 6502 (NES) addresses
-!headersize = $10 ; NES header size
+!headersize = $10	; NES header size
+optimize dp always	; Always use optimized label values 
+dpbase 0		; Set the dp base to 0 for 8bit labels
 
 ;------------------------------------------------------------------
 ; Metroid + Saving (v 0.3) - snarfblam: http:;www.romhacking.net/hacks/1186/
