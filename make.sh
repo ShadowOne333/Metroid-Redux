@@ -93,7 +93,7 @@ Start()
 
 	# Patch "Metroid Mother", then "Saving Unofficial 0.5.2"
 	#echo "Patching 'Metroid Mother' patch...";
-	$flips -a -i "patches/Mother.ips" "$patched_rom"
+	#$flips -a -i "patches/Mother.ips" "$patched_rom"
 	#echo "Patching 'Metroid+Saving' Unofficial' patch...";
 	#$flips -a -i "patches/Saving.ips" "$patched_rom"
 

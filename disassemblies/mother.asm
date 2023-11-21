@@ -274,9 +274,103 @@ l_8ACD:
 	db $02,$02,$14,$FF
 
 
+; DONE AUTOMATICALLY WITH ASAR'S EXPANSION METHOD, NOT NEEDED!!!
+;%org($99A8,14)	; 0x399B8
+	;%fillto($BFFF,14,$00)
 
+%org($BFFE,14)	; 0x3C00E
+	dw $C65A	; 5A C6 (?)
 
+;-------------------------------------
+;	Copy Bank 7 into Bank 15
+;-------------------------------------
 
+GameMode	= $1D	; 0 = Game is playing, 1 = At title/password screen
+MMCReg0Cntrl	= $25	; Stores bits to be loaded into MMC1 Register 0
+SwitchUpperBits	= $28	; Used to store bits 3 and 4 for MMC1 register 3.  Bits 3 and 4 should always be 0 under normal conditions
 
+PPUScroll	= $2005
+
+MMC1Reg0	= $8000	; Writing to any of these addresses or any
+MMC1Reg1	= $A000	; address in between will write configuration
+MMC1Reg2	= $C000	; bits to the MMC chip.
+MMC1Reg3	= $E000	; 
+
+;-------------------------------------
+
+%org($C000,15)	; 0x3C010
+
+; The following $1A bytes are modified by Saving -> RNG.asm
+	skip $1A
+
+Startup:
+	lda #$00
+	sta MMC1Reg1	; Clear bit 0. MMC1 is serial controlled
+	sta MMC1Reg1	; Clear bit 1
+	sta MMC1Reg1	; Clear bit 2
+	sta MMC1Reg1	; Clear bit 3
+	sta MMC1Reg1	; Clear bit 4
+	sta MMC1Reg2	; Clear bit 0
+	sta MMC1Reg2	; Clear bit 1
+	sta MMC1Reg2	; Clear bit 2
+	sta MMC1Reg2	; Clear bit 3
+	sta MMC1Reg2	; Clear bit 4
+	jsr MMCWriteReg3	; ($C4FA)Swap to PRG bank #0 at $8000
+	dex		; X = $FF
+	txs		; S points to end of stack page
+
+; Clear RAM at $000-$7FF.
+	ldy #$07	; High byte of start address.
+	sty $01
+	ldy #$00	; Low byte of start address.
+	sty $00		; $0000 = #$0700
+	tya		; A = 0
+	-	sta ($00),y	; Clear address
+		iny		;
+	bne -		; Repeat for entire page.
+		dec $01	; Decrement high byte of address.
+		bmi +	; If $01 < 0, all pages are cleared.
+		ldx $01
+		cpx #$01	; Keep looping until ram is cleared.
+	bne -
+
+; Clear cartridge RAM at $6000-$7FFF
++	ldy #$7F	; High byte of start address.
+	sty $01
+	ldy #$00	; Low byte of start address.
+	sty $00		; $0000 points to $7F00
+	tya		; A = 0
+	-	sta ($00),y
+		iny	; Clears 256 bytes of memory before decrementing to next-->
+	bne -		; 256 bytes.
+		dec $01
+		ldx $01	;I s address < $6000?-->
+		cpx #$60	; If not, do another page.
+	bcs -
+
+	lda #%00011110	; Verticle mirroring
+			; H/V mirroring (As opposed to one-screen mirroring).
+			; Switch low PRGROM area during a page switch.
+			; 16KB PRGROM switching enabled.
+			; 8KB CHRROM switching enabled.
+
+	sta MMCReg0Cntrl
+
+	lda #$00	; Clear bits 3 and 4 of MMC1 register 3
+	sta SwitchUpperBits
+
+	ldy #$00
+	sty ScrollX
+	sty ScrollY
+	sty PPUScroll
+	sty PPUScroll
+	iny
+	sty GameMode
+	;jsr ClearNameTables
+	;jsr EraseAllSprites
+	
+
+%org($C4FA,15)	; 0x3C50A
+MMCWriteReg3:
 
 

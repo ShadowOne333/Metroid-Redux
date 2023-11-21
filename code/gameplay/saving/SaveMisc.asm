@@ -13,7 +13,7 @@
 	lda $1E		; Load MainRoutine(?), NoChecksum in our variables
 	cmp #$03	; Is game engine running?
 	bne +		; If not, then check for routine #5 (Pause)
-	jmp $7D04	; If game is running, jump to $7D04
+	jmp ShowMap	; If game is running, jump to $7D04
 +	cmp #$05	; Is game paused?
 	bne +		; If not routine #5 either, don't care about START being pressed
 	lda #$03	; Otherwise, switch to routine #3 (game engine)
@@ -27,7 +27,9 @@
 
 ;-------------------------------------
 ; Changes to a modified AccessSavedGame routine from the original game. From $CA35 up to $CADA
+; Following changes are dependant on the Metroid Mother hack
 %org($CA35,15)	; 0x3CA45
+l_CA35:
 	inc $6FF0
 	lda #$FF
 	sta $6FF1
