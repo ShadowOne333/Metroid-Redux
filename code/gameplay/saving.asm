@@ -166,6 +166,7 @@ ScreenOn		= $C447
 NmiOn			= $C487	; Turn on VBlank interrupts
 ROMSwitch		= $C4EF
 SamusRun		= $CCC2
+DoJump			= $CD40	; Perform a Jump (Walljump)
 DisplayBar		= $E0C1
 CheckMoveLeft		= $E880
 CheckMoveRight		= $E88B
@@ -184,12 +185,18 @@ MapData		= $9400	; Address of map data in bank $E
 ;	ROM executed code
 ;-------------------------------------
 
-incsrc "saving/FileSaveLoad.asm"
-incsrc "saving/Map_ROM.asm"
-incsrc "saving/wavyIce.asm"
 incsrc "saving/FastDoors.asm"
+incsrc "saving/FileSaveLoad.asm"
+incsrc "saving/HUD.asm"
+incsrc "saving/ItemDrops.asm"
+incsrc "saving/Map_ROM.asm"
+; Additional code added for Saving Unofficial v0.4 - v0.5.2
+incsrc "saving/Minimap.asm"
 incsrc "saving/MissileDoors.asm"
+incsrc "saving/MorphBall.asm"
 incsrc "saving/RNG.asm"
+incsrc "saving/Walljump.asm"
+incsrc "saving/WavyIce.asm"
 
 ;-------------------------------------
 ;	RAM executed code
@@ -207,9 +214,6 @@ base $7D00	; Modify base address so the jmp/jsr properly point to the right plac
 	incsrc "saving/MinimapPos.asm"
 
 base off
-
-; Additional code added for Saving Unofficial v0.4 - v0.5.2
-incsrc "code/gameplay/saving/Minimap.asm"
 
 ;-------------------------------------------------------------------
 ; Free memory
@@ -230,7 +234,7 @@ incsrc "code/gameplay/saving/Minimap.asm"
 ; The bank lock variables used to be stored in the same region of WRAM as the save files, so it wasn't cleared on RESET. This means, if there is garbage in the RAM, the lock may be set on boot, which causes a deadlock!
 
 ; Here we just update all references to said variable to use memory locations that will be cleared on RESET
-
+;-------------------------------------
 %org($CA36,15)	; $3CA46
 	dw BankLock
 %org($CA46,15)	; $3CA56
@@ -241,7 +245,7 @@ incsrc "code/gameplay/saving/Minimap.asm"
 	dw BankLock
 %org($CAB5,15)	; $3CAC5
 	dw BankLock
-
+;-------------------------------------
 %org($CA3B,15)	; $3CA4B
 	dw RoomDataBanked
 %org($CA57,15)	; $3CA67
@@ -250,6 +254,7 @@ incsrc "code/gameplay/saving/Minimap.asm"
 	dw RoomDataBanked
 %org($CACC,15)	; $3CADC
 	dw RoomDataBanked
+;-------------------------------------
 
 
 

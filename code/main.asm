@@ -59,6 +59,7 @@ incsrc "code/header.asm"
 ;		Main code
 ;----------------------------------------
 
+incsrc "code/gameplay/HideEnemiesInDoors.asm"
 incsrc "disassemblies/mother.asm"
 incsrc "code/gameplay/saving.asm"	; Missing Automap
 incsrc "code/gameplay/misc.asm"

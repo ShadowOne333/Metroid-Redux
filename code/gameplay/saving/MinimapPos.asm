@@ -1,5 +1,5 @@
-MinimapPos:
-l_7EA8:	; $399B8
+; Minimap RAM
+MinimapPos:	; 0x399B8 ($7EA8)
 	jsr GetMapCords
 	dec MinimapRAM.MinimapY
 	dec MinimapRAM.MinimapX
@@ -70,23 +70,6 @@ l_7ED7:
 +	stx $5B
 	jmp DisplayBar
 
-l_7F30:
-	lda $12
-	bpl +
-		lda #$01
-		bit $14
-		bne ++
-			asl
-			bit $14
-			beq +
-			jsr CheckMoveRight
-			bcs +
-			bcc +++
-		++	jsr CheckMoveLeft
-			bcs +
-		+++	lda ObjVertSpeed
-		bne +
-		jsr $CD40	; Samus Horz Speed Max
-+	jmp SamusRun
+
 
 

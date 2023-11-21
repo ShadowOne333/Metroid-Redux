@@ -44,7 +44,7 @@
 
 ; Hijack
 ; ------
-%org($F5EE,$15)	; 0x3F5F5, Bank $0F
+%org($F5EE,$15)	; 0x3F5FE, Bank $0F
 ;.PATCH 0F:F5EE
 	JMP WavyIce_NewDamage
 

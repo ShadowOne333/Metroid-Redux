@@ -1,12 +1,5 @@
-;-------------------------------
+;-------------------------------------
 ;	Other banks
-;-------------------------------
-
-; Random unused table that Deejaynerate EA'd for some reason [possibly to make IPS peek analysis easier] (0.4 had it almost like vanilla but with EAs instead of zeros, though 0.3 *does* EA this too. probably drop this edit, it's stupid)
-%org($BF56,1)	; 0x07F66
-
-	%fillto($BFB0,1,$EA)
-
 ;-------------------------------------
 
 ; Enemy sprite drawing pointer tables
@@ -1450,148 +1443,10 @@ l_84DF:	; $304EF
 
 ;-------------------------------------
 
-; Main routine changes
-%org($C121,15)	; 0x3C131
-	lda $1E		; Load MainRoutine(?), NoChecksum in our variables
-	cmp #$03	; Is game engine running?
-	bne +		; If not, then check for routine #5 (Pause)
-	jmp $7D04	; If game is running, jump to $7D04
-+	cmp #$05	; Is game paused?
-	bne +		; If not routine #5 either, don't care about START being pressed
-	lda #$03	; Otherwise, switch to routine #3 (game engine)
-	nop		; NOP leftover byte from LDA #$05
-	skip 11
-+
-
-%org($C1F7,15)	; 0x3C207
-; Check if TitleRoutine is $17, if not then branch
-	cmp #$17	; #$15 -> #$17
-
-;-------------------------------------
-; Changes to a modified AccessSavedGame routine from the original game. From $CA35 up to $CADA
-%org($CA35,15)	; 0x3CA45
-	inc $6FF0
-	lda #$FF
-	sta $6FF1
-
-%org($CA45,15)	; 0x3CA55
-l_CA45:
-	dec $6FF0
-	beq +
-	dec $6FF0
-	jmp $CABD
-+	rts
-
-	inc $6FF0
-	lda #$00
-	sta $6FF1
-
-%org($CAB4,15)	; 0x3CAC4
-	asl $6FF0
-%org($CABE,15)	; 0x3CACE
-	bit $6FF1	
-%org($CACB,15)	; 0x3CADB
-	bit $6FF1	; Originally $CAEF (SavedDataTable)
-
 ; Change the Display bar jump
 %org($CB57,15)	; 0x3CB67
-; Jump to custom Minimap (minimappos.asm) routine
+; Jump to custom Minimap (MinimapPos.asm) routine
 	jsr MinimapPos	; $7EA8, Originally $E0C1 (DisplayBar)
-
-; Modify the Samus Run animation pointer
-%org($CC24,15)	; 0x3CC34
-	dw l_7F30	; $7F30, Originally $CCC2 (SamusRun)
-
-;-------------------------------------
-
-; Modify the Break out of "Ball mode" routine
-; How high a ceiling above morphball can exist to trigger unmorphing (Morphball ceiling fix)
-%org($D0F5,15)	; 0x3D105
-	adc #$00	; #$08 -> #$00
-; CHANGE MORPH BALL SO IT DOESN'T MAKE THE ROLL ANIM AUTOMATICALLY, AND ONLY ROLLS WHEN MOVING LEFT/RIGHT
-
-;-------------------------------------
-
-; Modify the Update jump for the Ice Beam projectile so it accounts for the new Wave+Ice stack
-%org($D5C5,15)	; 0x3D5D5
-	jmp $7E66	; Originally jmp $D4EB (UpdateBullet)
-
-; Do NOT clear the status of Wave Beam and Ice Beam so they can be stacked up
-%org($DBD2,15)	; 0x3DBE2
-	nop #8
-
-;LDBD2:  lda SamusGear		;Clear status of wave beam and ice beam power ups.
-;LDBD5:  and #$3F		;
-;LDBD7:  sta SamusGear		;Remove beam weapon data from Samus gear byte.
-
-;-------------------------------------
-;	Item drop table
-;-------------------------------------
-;The following table determines what, if any, items an enemy will drop when it is killed.
-; Replaced one "no item" byte with a missile byte, increasing the drop rate of missiles
-%org($DE35,15)	; 0x3DE45
-ItemDropTbl:
-	db $80		;Missile.
-	db $81		;Energy.
-	db $89		;No item.
-	db $80		;Missile.
-	db $81		;Energy.
-	db $89		;No item.
-	db $81		;Energy.
-	db $80		;No item. ($89->$80)
-
-;-------------------------------------
-;	HUD Layout Positions
-;-------------------------------------
-
-; How many bytes from the DataDisplayTbl [3E1C9-3E1F0] to use (Each 4 bytes removed is one sprite removed from the HUD display, starting from the bottom of the table.
-; If this byte is not a multiple of 4, the game WILL crash. v0.4 did this to reduce sprite count to account for the minimap but ultimately the sprite flickering is rare enough to keep it vanilla.
-; If you really want to reduce sprite count through this, I'd recommend bringing it down to $14, keeping just the counter digits and one missile sprite/tile to distinguish the missile count from the energy count. It's ultimately whatever, though.)
-%org($E0CF,15)	; 0x3E0DF
-; 10*4. At end of DataDisplayTbl?
-; If not, loop to load next byte from table
-	cpy #$28	; cpy #$28, Recommended #$14
-
-
-%org($E153,15)	; 0x3E163
-	lda #$18	; X position of first HUD E-Tank sprite
-%org($E17B,15)	; 0x3E18B
-	lda #$17	; Y position of HUD E-Tank sprites
-
-
-%org($E18F,15)	; 0x3E19F
-; In what direction should succeeding E-Tanks should go relative to the first one (goes in tandem with 3E1A0)
-	db $69
-; X distance betweeen HUD E-Tank sprites relative to each other
-	db $07
-
-;-------------------------------------
-;	Status bar sprite data
-;-------------------------------------
-%org($E1B9,15)	; 0x3E1C9
-; PPU transfers for HUD
-DataDisplayTbl:
-	db $21,$A0,$01,$38	; Upper health digit ($30->$38)
-	db $21,$A0,$01,$40	; Lower health digit ($38->$30)
-	db $2B,$FF,$01,$28	; Upper missile digit.
-	db $2B,$FF,$01,$30	; Middle missile digit.
-	db $2B,$FF,$01,$38	; Lower missile digit.
-	db $2B,$5E,$00,$18	; Left half of missile.
-	db $2B,$5F,$00,$20	; Right half of missile.
-	db $21,$76,$01,$18	; E
-	db $21,$7F,$01,$20	; N
-	db $21,$3A,$01,$28	; ... - Changed $00 to $01 to make "ENERGY" all blue
-
-; How many missiles you get from missile drops
-; NOTE: missile pickups work differently in Tourian/with Metroids, basically you get more missiles the more missile packs you have
-%org($F4B7,14)	; 0x3F4C7
-	lda #$05	; lda #$02
-
-;-------------------------------
-
-%org($F5EE,14)	; 0x3F5FE
-	jmp $7E73
-	nop	; Residual $15 from a BEQ $15
 
 ;-------------------------------
 

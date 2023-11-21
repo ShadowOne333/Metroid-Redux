@@ -9,9 +9,9 @@ struct MinimapRAM $7D00
 
 endstruct
 ;-------------------------------------
-ShowMap:
+ShowMap:	; 0x39814 ($7D04)
 ; Uses $00, $01, $02
-	
+
 ; Clear sprite RAM	
 	ldy #$00
 	lda #$00

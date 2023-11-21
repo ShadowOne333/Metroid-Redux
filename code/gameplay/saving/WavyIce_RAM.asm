@@ -1,4 +1,4 @@
-WavyIce_NewBehavior:
+WavyIce_NewBehavior:	; 0x399
 
 	lda SamusGear	; Check equipment
 	and #$40	; Has wave?
@@ -8,7 +8,6 @@ WavyIce_NewBehavior:
 
 NoWave:
 	jmp $D4EB	; No - UpdateBullet
-	
 
 WavyIce_NewDamage:
 ; Y: Weapon type
