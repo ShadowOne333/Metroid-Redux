@@ -912,9 +912,10 @@ InitializeStats:
 	jsr InitializeStats_InitHealth	; Jump to custom code
 
 
-%org($C920,15)	; 0x3C930
+; Moved to Fast Doors
+;%org($C920,15)	; 0x3C930
 ; Hijack - Instead of initializing health to 030.0 every game, only set to 030.0 if it is less (i.e. player has died, or saved with very low health)
-	jmp CheckMinHealth
+	;jmp CheckMinHealth
 
 
 %org($939E,0)	; 0x013AE
@@ -933,12 +934,12 @@ PasswordChecksumAndScramble:
 	sta PasswordByte11
 	rts	; NO Scrambling
 	nop #3
-; All this is just an NOP in Saving 0.5.2, requires a check
+; All this is just an RTS in Saving 0.5.2, requires a check
 
 %org($8D0C,0)	; 0x00D1C
 ; Remove call to LoadPasswordChar
 	jmp PasswordChecksumAndScramble	; Originally jsr $8E17
-
+	;jmp $8E17
 
 %org($8132,0)	; 0x00142
 ; Doubling the speed of the METROID fade in here

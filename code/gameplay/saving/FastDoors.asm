@@ -6,6 +6,10 @@
 %org($C920,15)	; 0x3C930
 	jmp Section4	; Fast Doors fix routine
 
+; Fix palette loading from Fast Doors
+%org($C92B,15)	; $3C93B
+	jsr Section4	; Originally JSR $E1F1, changed to new code for Fast Doors which fixes wrong palette loading
+
 ; Overwrite NARPASSWORD subroutine from the main Game Engine section
 %org($C931,15)	; 0x3C941
 	jsr $E1F1

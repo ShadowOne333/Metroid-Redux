@@ -5,20 +5,20 @@
 export	time=$(date +'%T %a %d/%b/%Y')
 export	asar=bin/asar-win/asar-standalone.exe
 export	flips=bin/flips.exe
-export	file_base=Super-Metroid-Redux
+export	file_base=Metroid-Redux
 export  out_folder=out
 export	patches_folder=patches
-export  clean_rom=rom/SuperMetroid.sfc
-export  patched_rom=$out_folder/$file_base.sfc
+export  clean_rom=rom/Metroid.nes
+export  patched_rom=$out_folder/$file_base.nes
 export  asm_file=code/main.asm
-export	checksum=da957f0d63d14cb441d215462904c4fa8519c613
+export	checksum=166a5b1344b17f98b6b18794094f745f8a7435b8
 
 #-------------------------------------------------------------
 # Help section
 Help()
 {
    # Display Help
-   echo "Compile 'Super Metroid Redux' with one of the following arguments:"
+   echo "Compile 'Metroid Redux' with one of the following arguments:"
    echo
    echo "Syntax: make.sh [option]"
    echo "Options:"
@@ -43,18 +43,18 @@ Help()
 Start()
 {
 # Check base ROM name
-	if [ -e "rom/Super Metroid (Japan, USA) (En,Ja).sfc" ]; then
+	if [ -e "rom/Metroid (U).nes" ]; then
 		echo "ROM detected. Verifying name..."
 	else
 		export error="Incorrect ROM name."
 		Error;	
-		echo "Please, rename the ROM to 'Super Metroid (Japan, USA) (En,Ja).sfc' to begin the patching process."
+		echo "Please, rename the ROM to 'Metroid (U).nes' to begin the patching process."
 		End;
 	fi
 
 #-------------------------------------------------------------
 # Copy base ROM into the /out/ folder
-	cd rom/ && cp "Super Metroid (Japan, USA) (En,Ja).sfc" SuperMetroid.sfc && cd ..
+	cd rom/ && cp "Metroid (U).nes" Metroid.nes && cd ..
 	test ! -d "$out_folder" && mkdir "$out_folder"
 	test -f "$patched_rom" && rm "$patched_rom"
 
@@ -66,7 +66,7 @@ Start()
 	else
 		export error="Base ROM not found."
 		Error;
-		echo "Place the 'Super Metroid (Japan, USA) (En,Ja).sfc' ROM inside the 'rom' folder."
+		echo "Place the 'Metroid (U).nes' ROM inside the 'rom' folder."
 		End;
 	fi
 
@@ -80,7 +80,7 @@ Start()
 	else
 		export error="Base ROM checksum is incorrect."
 		Error;
-		echo "Use a Super Metroid ROM with the proper SHA-1 checksum for patching."
+		echo "Use a Metroid ROM with the proper SHA-1 checksum for patching."
 		End;
 	fi
 
@@ -90,8 +90,15 @@ Start()
 
 #-------------------------------------------------------------
 # Compile the main assembly code
+
+	# Patch "Metroid Mother", then "Saving Unofficial 0.5.2"
+	#echo "Patching 'Metroid Mother' patch...";
+	#$flips -a -i "patches/Mother.ips" "$patched_rom"
+	#echo "Patching 'Metroid+Saving' Unofficial' patch...";
+	#$flips -a -i "patches/Saving.ips" "$patched_rom"
+
 	echo "Beginning main assembly code compilation with Asar..."; echo
-	$asar $asm_file $patched_rom		# Main code
+	$asar --no-title-check --fix-checksum=off $asm_file $patched_rom	# Main code
 
 	echo "Main assembly code compilation succeded!"; echo
 
@@ -120,6 +127,10 @@ End()
 	if [ -f "$clean_rom" ]; then
 		rm $clean_rom
 	fi
+
+	cp "patches/$file_base.ips" "patches/Metroid Redux.ips"
+	rm "patches/$file_base.ips"
+
 	sleep 1
 	exit
 }
@@ -134,9 +145,9 @@ else
 	#case $option in
 
 	# Force default settings at startup
-	sed -i 's/!newgfx = 0/!newgfx = 1/g' $asm_file
-	sed -i 's/!subtitle = 1/!subtitle = 0/g' $asm_file
-	sed -i 's/!retranslation = 1/!retranslation = 0/g' $asm_file
+	#sed -i 's/!newgfx = 0/!newgfx = 1/g' $asm_file
+	#sed -i 's/!subtitle = 1/!subtitle = 0/g' $asm_file
+	#sed -i 's/!retranslation = 1/!retranslation = 0/g' $asm_file
 
 	while [ ! -z "$1" ]; do
 

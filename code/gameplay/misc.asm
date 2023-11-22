@@ -112,13 +112,6 @@ warnpc $B1F0
 %org($99D9,14)	; $399E9
 	lda #$D0	; Move corner map X position
 
-
-;-------------------------------------
-
-; Fix palette loading from Fast Doors
-%org($C92B,15)	; $3C93B
-	jsr Section4	; Originally JSR $E1F1, changed to new code for Fast Doors which fixes wrong palette loading
-
 ;-------------------------------------
 ; Change ending times to make it more forgiveable
 %org($CB18,15)	; $3CB28
@@ -134,7 +127,6 @@ warnpc $B1F0
 	cmp #$07	; Change max tanks from $06 to $08 to accommodate for the extra 2 tanks you can get in the game
 ; NOTE: THIS NEEDS A FIX SO THAT OBTAINING ALL 8 ENERGY TANKS DOESN'T SCREW UP THE FILE BELOW IN THE FILE SELECT OPTION
 
-
 ;-------------------------------------
 ;   Make doors have unique tiles
 ;-------------------------------------
@@ -146,6 +138,14 @@ warnpc $B1F0
 	bcs $04
 
 ; C9 (A0 + normal doorway tiles) 90 06 C9 (A0 + normal doorway tiles + horizontal doorway tiles) B0 04
-;-------------------------------------
 
+;-------------------------------------
+;   Drop bombs while falling
+;-------------------------------------
+%org($D15D,15)	; $3D16D
+; Originally LDA $0308
+; This is a check to see if samus is rising or falling. You can only place a bomb when this value is 00 (on the ground or the frame at the height of the jump just before falling) changing this to A9 00 EA instead will say that you are always at a 00 vertical movement speed.
+	lda #$00	
+	nop
+	
 

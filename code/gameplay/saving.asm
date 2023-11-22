@@ -51,6 +51,7 @@ Joy2Change	= $13	;
 Joy1Status	= $14	; Buttons held this frame
 Joy2Status	= $15	;
 PalDataPending	= $1C	; Pending palette data. Palette # = PalDataPending - 1
+MainRoutine	= $1E	; 5 = Game paused, 3 = Game engine running
 TitleRoutine	= $1F	; Identifies which "mode" title screen is in (title screen uses a state machine)
 Timer1		= $2A	; Timer. Decremented every frame if > 0.
 Timer2		= $2B	; Timer. Decremented every frame if > 0.
@@ -175,7 +176,7 @@ Reset			= $FFB0
 
 ; Map data and 
 MapRAM			= $7900	; Address of 
-MapData		= $9400	; Address of map data in bank $E
+MapData			= $9400	; Address of map data in bank $E
 
 ;if (<MapRam) != $00
 	;.error MapRAM must begin on a $100 byte boundary 
@@ -195,6 +196,7 @@ incsrc "saving/Minimap.asm"
 incsrc "saving/MissileDoors.asm"
 incsrc "saving/MorphBall.asm"
 incsrc "saving/RNG.asm"
+incsrc "saving/SaveMisc.asm"
 incsrc "saving/Walljump.asm"
 incsrc "saving/WavyIce.asm"
 
@@ -235,25 +237,25 @@ base off
 
 ; Here we just update all references to said variable to use memory locations that will be cleared on RESET
 ;-------------------------------------
-%org($CA36,15)	; $3CA46
-	dw BankLock
-%org($CA46,15)	; $3CA56
-	dw BankLock
-%org($CA4B,15)	; $3CA5B
-	dw BankLock
-%org($CA52,15)	; $3CA62
-	dw BankLock
-%org($CAB5,15)	; $3CAC5
-	dw BankLock
+%org($CA35,15)	; $3CA45
+	inc BankLock
+%org($CA45,15)	; $3CA55
+	dec BankLock
+%org($CA4A,15)	; $3CA5A
+	dec BankLock
+%org($CA51,15)	; $3CA61
+	inc BankLock
+%org($CAB4,15)	; $3CAC4
+	asl BankLock
 ;-------------------------------------
-%org($CA3B,15)	; $3CA4B
-	dw RoomDataBanked
-%org($CA57,15)	; $3CA67
-	dw RoomDataBanked
-%org($CABF,15)	; $3CACF
-	dw RoomDataBanked
-%org($CACC,15)	; $3CADC
-	dw RoomDataBanked
+%org($CA3A,15)	; $3CA4A
+	sta RoomDataBanked
+%org($CA56,15)	; $3CA66
+	sta RoomDataBanked
+%org($CABE,15)	; $3CACE
+	bit RoomDataBanked
+%org($CACB,15)	; $3CADB
+	bit RoomDataBanked
 ;-------------------------------------
 
 

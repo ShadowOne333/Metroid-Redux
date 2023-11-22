@@ -59,7 +59,7 @@ BC12A:	cmp #$05
 BC12C:	bne +		; $C13C
 BC12E:	lda #$03
 BC130:	nop
-	skip 12
+	skip 11
 	+
 ;GoMainRoutine:
 ;LC114:	lda GameMode			;0 if game is running, 1 if at intro screen.

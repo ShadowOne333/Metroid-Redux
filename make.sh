@@ -76,7 +76,7 @@ Start()
 # SHA-1 sum verified, begin patching...
 	if [ "$sha1" == "$checksum" ]; then
 		echo; echo "Base ROM SHA-1 checksum verified."
-		echo "Starting patching process..."
+		echo "Starting patching process..."; echo
 	else
 		export error="Base ROM checksum is incorrect."
 		Error;
@@ -96,6 +96,11 @@ Start()
 	#$flips -a -i "patches/Mother.ips" "$patched_rom"
 	#echo "Patching 'Metroid+Saving' Unofficial' patch...";
 	#$flips -a -i "patches/Saving.ips" "$patched_rom"
+
+	# Copy bank 7 from the original Metroid into bank 15 of Redux
+	echo "Copying bank 7 into bank 15..."
+	dd bs=1 skip=$((0x1C010)) count=$((0x4000)) if=$clean_rom seek=$((0x3C010)) of=$patched_rom
+	echo "Copy of bank 7 into bank 15 successful!"; echo
 
 	echo "Beginning main assembly code compilation with Asar..."; echo
 	$asar --no-title-check --fix-checksum=off $asm_file $patched_rom	# Main code

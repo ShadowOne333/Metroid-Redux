@@ -10,7 +10,7 @@ optimize dp always	; Always use optimized label values
 dpbase 0		; Set the dp base to 0 for 8bit labels
 
 ;------------------------------------------------------------------
-; Metroid + Saving (v 0.3) - snarfblam: http:;www.romhacking.net/hacks/1186/
+; Metroid + Saving (v0.3) - snarfblam: http:;www.romhacking.net/hacks/1186/
 ;    Minimap
 ;    Savefiles
 ;    Beamstacking
