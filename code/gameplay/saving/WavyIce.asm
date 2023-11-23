@@ -6,14 +6,11 @@
 ; NOPs out the code that removes one beam
 ; when the play aquires another.
 ;===========================================
-%org($DBD2,$15)	; 0x3DBE2, Bank $0F
-;.PATCH 0F:DBD2
+%org($DBD2,15)	; 0x3DBE2, Bank $0F
 
-	nop #3 ; LDA $6878
-
-	nop #2 ; AND #$3F
-
-	nop #3 ; STA $6878
+	nop #8	; lda $6878
+		; and #$3F
+		; sta $6878
 	
 	
 ;===========================================
@@ -25,8 +22,7 @@
 
 ; Hijack
 ; ------
-%org($D5C5,$15)	; 0x3D5D5, Bank $0F
-;.PATCH 0F:D5C5
+%org($D5C5,15)	; 0x3D5D5, Bank $0F
 	jmp WavyIce_NewBehavior
 
 ; New code
@@ -44,9 +40,8 @@
 
 ; Hijack
 ; ------
-%org($F5EE,$15)	; 0x3F5FE, Bank $0F
-;.PATCH 0F:F5EE
-	JMP WavyIce_NewDamage
+%org($F5EE,15)	; 0x3F5FE, Bank $0F
+	jmp WavyIce_NewDamage
 
 ; New Code
 ; --- ----

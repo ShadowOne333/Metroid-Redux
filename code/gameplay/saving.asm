@@ -141,16 +141,16 @@ FileIndex_3	= FileSize*2
 ;-------------------------------------
 
 	; Constants
-PasswordDataSize	=  $12	; Number of bytes is password data (see PasswordBytes)
-Joy_Left	= $02	; Controller buttons
-Joy_Right	= $01
-Joy_Down	= $04
-Joy_Up		= $08
-MapLeft	= $64	; Map position on screen
-MapTop		= $32
-MapWidth	= 7	; Map size, in tiles
-MapHeight	= 7
-SamusBlipTile	= $BF
+PasswordDataSize	= $12	; Number of bytes is password data (see PasswordBytes)
+Joy_Left		= $02	; Controller buttons
+Joy_Right		= $01
+Joy_Down		= $04
+Joy_Up			= $08
+MapLeft			= $64	; Map position on screen
+MapTop			= $32
+MapWidth		= 7	; Map size, in tiles
+MapHeight		= 7
+SamusBlipTile		= $BF
 
 	; Existing routines
 UpdateSparkleSprites	= $87CF
@@ -175,7 +175,7 @@ HexToDec		= $E198
 Reset			= $FFB0
 
 ; Map data and 
-MapRAM			= $7900	; Address of 
+MapRAM			= $7900	; Address of map data in RAM $7900
 MapData			= $9400	; Address of map data in bank $E
 
 ;if (<MapRam) != $00
@@ -186,15 +186,16 @@ MapData			= $9400	; Address of map data in bank $E
 ;	ROM executed code
 ;-------------------------------------
 
+; This includes code added in Saving Unofficial v0.4 - v0.5.2
 incsrc "saving/FastDoors.asm"
 incsrc "saving/FileSaveLoad.asm"
 incsrc "saving/HUD.asm"
 incsrc "saving/ItemDrops.asm"
+incsrc "saving/MapData.asm"
 incsrc "saving/Map_ROM.asm"
-; Additional code added for Saving Unofficial v0.4 - v0.5.2
-incsrc "saving/Minimap.asm"
 incsrc "saving/MissileDoors.asm"
 incsrc "saving/MorphBall.asm"
+incsrc "saving/MovedData.asm"
 incsrc "saving/RNG.asm"
 incsrc "saving/SaveMisc.asm"
 incsrc "saving/Walljump.asm"

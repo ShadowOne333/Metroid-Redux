@@ -49,11 +49,12 @@ incsrc "code/macros.asm"
 incsrc "code/header.asm"
 
 ;----------------------------------------
-;	Expand the ROM to 0x60000
+;   Copy ROM banks into Expanded Area
 ;----------------------------------------
 
-%org($FFFF,22)	; $5FFFF
-	db $00
+; Copy Bank 7 into Bank 15
+%org($C000,15)	; 0x3C010
+incbin "rom/Metroid.nes":$1C010..$20010
 
 ;----------------------------------------
 ;		Main code
