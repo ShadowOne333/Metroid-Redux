@@ -6,7 +6,38 @@
 ; Metroid mother hack originally made by dACE, which combines hacks like Metroid+Saving (snarfblam), Roidz (DemickXII) and MDbtroid (Infinity's End)
 ; Disassembly by ShadowOne333
 
+;-------------------------------------
+;	Declarations
+;-------------------------------------
+
+	; Existing vars (names generally taken from M1 disassembly)
+CurrentBank	= $23	; Current memory page in lower memory block
+StructPtr	= $35	; Low byte of structure pointer address
+;StructPtr+1	= $36	; High byte of structure pointer address
+MacroPtr	= $3F	; Low byte of pointer into macro definitions
+;MacroPtr+1	= $40	; High byte of pointer into macro definitions
+PageIndex	= $4B	; Index to object data.
+			; #$D0, #$E0, #$F0 = Projectile indices (including bombs)
+RoomNumber	= $5A	; Room number currently being loaded
+
+	; Existing routines
+NMIVector	= $C0D9	; Non-Maskable Interrupt routine
+MMCWriteReg3	= $C4FA	; Swap to PRG bank #0 at $8000
 LoadGFX7	= $C601	; LoadGFX7 (THE NEW VERSION for enhanced ROMs)
+IncBankLock1	= $CA35	; Increment BankLock
+DecBankLock1	= $CA45	; Decrement BankLock
+IncBankLock2	= $CA51	; Increment BankLock
+SaveSamusData	= $CA61	; Prepare to save Samus' data
+SaveSamusDataInSlot	= $CA69	; Save Samus' data in appropriate saved game slot
+EraseAllGameData	= $CAA1	; Erase selected saved game data
+LoopUntilErased	= $CAB4	; Loop until all saved game data is erased
+BitRoomDataBanked	= $CABD	; bit RoomDataBanked
+GetEnemyData	= $EB0C	; Obtain enemy data
+ChooseHandlerRoutine	= $EDD6	; Choose handler routine
+DrawStruct	= $EAA2	; Jump to DrawStruct routine at $EF8C
+Copy4Tiles	= $EF49	; Prepare to copy 4 tile numbers
+DoOneEnemy	= $F351	; 
+Xminus16	= $F1F4	; 
 
 ;-------------------------------
 ;	Include Text TBL file
@@ -273,105 +304,45 @@ l_8ACD:
 	db $F0,$F0,$F0,$F8,$F0,$00
 	db $F8,$F0,$F8,$F8,$F8,$00
 
-
+;-------------------------------------
 ; Graphics data, partial font "THE END"
-; Modified in mother to add/change to new graphics
+; Modified in Mother to add/change to new graphics
+;-------------------------------------
 %org($8D60,1)	; 0x04D70
 ; Copy over data from the original ROM starting at 0x05FD3
-	incbin "rom/Metroid.nes":$5FD2..$6284
+	incbin "rom/Metroid.nes":$5FD2..$6288
 
-Plts_9016:
-; Palette data
-	db $0F,$20,$10,$00
-	db $0F,$22,$12,$1C
-	db $0F,$27,$11,$07
-	db $0F,$22,$12,$1C
-	db $0F,$16,$19,$27
-	db $0F,$12,$30,$21
-	db $0F,$27,$2A,$3C
-	db $0F,$15,$21,$38
-	db $00		; Terminator
+; Copy over palette data from the original ROM starting at 0x06288
+Plts_9016:	; 0X05026
+	incbin "rom/Metroid.nes":$6288..$6324
 
-	db $3F,$12,$02
-	db $19,$27,$00
+; Ridley Room definitions, starting at room #$09
+l_90B2:		; 0x050C2
+	incbin "rom/Metroid.nes":$63E6..$6451
 
-	db $3F,$12,$02	; PPU address and length
-	db $2C,$27,$00
+; Force/change some room definition pointers from above
+%org($90B3,1)	; 0x050C3
+	dw $90C0
+	skip 12
+	dw $90CF
+	skip 13
+	dw $90DE
+	skip 13
+	dw $90EB
+	skip 11
+	dw $90F8
+	skip 11
+	dw $9106
+	skip 12
+	dw $9115
 
-	db $3F,$12,$02	; PPU address and length
-	db $19,$35,$00
-
-	db $3F,$12,$02	; PPU address and length
-	db $2C,$24,$00
-	
-	db $3F,$00,$10	; PPU address and length
-	db $0F,$20,$10,$00
-	db $0F,$28,$19,$17
-	db $0F,$27,$11,$07
-	db $0F,$28,$16,$17
-
-	db $3F,$14,$0C	; PPU address and length
-	db $0F,$12,$30,$21
-	db $0F,$26,$1A,$31
-	db $0F,$15,$21,$38
-	db $00
-
-	db $3F,$11,$03	; PPU address and length
-	db $04,$09,$07,$00
-
-	db $3F,$11,$03	; PPU address and length
-	db $05,$09,$17,$00
-
-	db $3F,$11,$03	; PPU address and length
-	db $06,$0A,$26,$00
-
-	db $3F,$11,$03	; PPU address and length
-	db $16,$19,$27,$00
-
-	db $3F,$00,$04	; PPU address and length
-	db $0F,$30,$30,$21,$00
-
-	db $3F,$10,$04	; PPU address and length
-	db $0F,$15,$34,$17,$00
-
-	db $3F,$10,$04	; PPU address and length
-	db $0F,$15,$34,$19,$00
-
-	db $3F,$10,$04	; PPU address and length
-	db $0F,$15,$34,$28,$00
-
-	db $3F,$10,$04
-	db $0F,$15,$34,$29,$00
-
-; Animation stuff?
-l_90B2:
-	db $02,$C0,$90,$03,$05,$04,$03,$00
-	db $0F,$FF
-
-	db $02,$05,$37,$00,$03,$CF,$90
-	db $18,$06,$02,$09,$67,$00,$1B,$FF
-	
-	db $02,$08,$87,$00,$05,$DE,$90
-	db $07,$06,$02,$02,$37,$00,$19,$FF
-
-	db $02,$00,$37,$00,$07,$EB,$90,$0C
-	db $04,$0A,$00,$19,$FF
-
-	db $02,$08,$87,$00,$09,$F8,$90,$13
-	db $06,$02,$07,$37,$00,$15,$FF
-	
-	db $03,$00,$0B,$06,$91,$12,$06,$02
-	db $09,$67,$00,$16,$FF
-	
-	db $04,$01,$00,$0E,$15,$91,$02,$06
-	db $02,$04,$96,$00,$09,$FF
-	
-	db $02,$08,$12,$00,$12,$FF,$FF,$07,$FF
-	db $04,$02,$00
-
+; Jump back where we left off
+%org($911D,1)	; 0x0512D
+l_911D:
 ; Copy over data from the original ROM starting at 0x06FA4
 	incbin "rom/Metroid.nes":$6F6B..$7000
 
+l_91B2:
 ; Pointers for new addresses
 	dw $9216,$9229,$9242,$925B
 	dw $9262,$9269,$926D,$9278
@@ -389,7 +360,40 @@ l_90B2:
 
 ; Copy over data from the original ROM starting at 0x06FA4
 	incbin "rom/Metroid.nes":$6C94..$6F00
-	%fillto($9490,1,$00)	; Blank out remaining original bytes
+
+	%fillto($94F5,1,$00)	; Blank out remaining original bytes
+
+; Ridley Room definitions (again), starting at room #$09
+l_94F5:		; 0x05504
+	incbin "rom/Metroid.nes":$63E6..$6451
+
+; Force/change some room definition pointers from above
+%org($94F6,1)	; 0x05506
+	dw $9503
+	skip 12
+	dw $9512
+	skip 13
+	dw $9521
+	skip 13
+	dw $952E
+	skip 11
+	dw $953B
+	skip 11
+	dw $9549
+	skip 12
+	dw $9558
+
+; Jump back where we left off
+%org($9560,1)	; 0x05570
+; Some pointers for the moved data's new addresses
+	dw $900F,$9033,$903F,$9039
+	dw $9045,$AFBC,$906E,$906E
+	dw $906E,$906E,$906E,$906E
+	dw $906E,$906E,$906E,$906E
+	dw $906E,$906E,$906E,$906E
+	dw $9075,$907C,$9083,$908A
+	dw $9092,$909A,$90A2,$90AA
+	dw $90B2,$9FC2,$8400,$8000
 
 ;-------------------------------------
 
@@ -439,24 +443,25 @@ EnemyFramePtrTbl1:
 ; Pointers to new addresses
 %org($9FC2,1)	; 0x05FD2
 l_9FC2:
-	db $0B,$87,$27,$87,$41,$87,$65,$87
-	db $A0,$87,$D2,$87,$09,$88,$3F,$88
-	db $6C,$88,$9E,$88,$C2,$88,$FA,$88
-	db $20,$89,$4C,$89,$78,$89,$9C,$89
-	db $C6,$89,$00,$8A,$27,$8A,$53,$8A
-	db $76,$8A,$8E,$8A,$BB,$8A,$DC,$8A
-	db $06,$8B,$46,$8B,$76,$8B,$9C,$8B
-	db $D2,$8B,$01,$8C,$1C,$8C,$5C,$8C
-	db $88,$8C,$B7,$8C,$E7,$8C,$11,$8D
-	db $47,$8D,$95,$8D,$D7,$8D,$0A,$8E
-	db $39,$8E,$62,$8E,$83,$8E,$B0,$8E
-	db $15,$8F,$44,$8F,$61,$8F,$FF,$FF
+	dW $870B,$87,$8727,$8741,$8765
+	dW $87A0,$87,$87D2,$8809,$883F
+	dW $886C,$88,$889E,$88C2,$88FA
+	dW $8920,$89,$894C,$8978,$899C
+	dW $89C6,$89,$8A00,$8A27,$8A53
+	dW $8A76,$8A,$8A8E,$8ABB,$8ADC
+	dW $8B06,$8B,$8B46,$8B76,$8B9C
+	dW $8BD2,$8B,$8C01,$8C1C,$8C5C
+	dW $8C88,$8C,$8CB7,$8CE7,$8D11
+	dW $8D47,$8D,$8D95,$8DD7,$8E0A
+	dW $8E39,$8E,$8E62,$8E83,$8EB0
+	dW $8F15,$8F,$8F44,$8F61,$FFFF
 
 ; Copy over data from the original ROM starting at 0x06453
 	incbin "rom/Metroid.nes":$6453..$6C94
 
 	%fillto($AFBC,1,$00)
 
+l_AFBC:
 ; Some palettes of sorts
 	db $3F,$00,$20		; PPU address and length
 	db $0F,$20,$10,$00
@@ -469,8 +474,8 @@ l_9FC2:
 	db $0F,$15,$21,$38
 	db $00		; Terminator byte
 
-; Could be some palette changing for animation?
 l_AFE0:
+; Could be some palette animation?
 	db $2B,$2C,$28,$0B,$1C,$0A,$1A,$FF
 	db $FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF
 	db $FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF
@@ -668,8 +673,8 @@ l_C109:
 	rts
 
 %org($C4F8,15)	; 0x3C508
-	sta $28	; SwitchUpperBits
-	;nop #2	; NOPs in the original Mother code (why?)
+	;sta $28	; SwitchUpperBits
+	nop #2	; NOPs in the original Mother code (why?)
 
 %org($C54C,15)	; 0x3C55C
 	jsr LoadGFX7
@@ -793,10 +798,148 @@ l_C6A0:
 	nop
 
 %org($C7B6,15)	; 0x3C7C6
-	lda $C63B,y
+	lda $C63B,y	; Load entry 25 in GFXInfo table
 
-%org($CA35,15)	; 0x3CA45
+%org($CA38,15)	; 0x3CA48
+	lda #$FF
+	sta RoomDataBanked
+	lda CurrentBank
+	clc
+	adc #$07
+	jsr MMCWriteReg3
+	dec BankLock
+	beq +
+	dec BankLock
+	jmp BitRoomDataBanked
++	rts
 
+	inc BankLock
+	lda #$00
+	sta RoomDataBanked
+	lda CurrentBank
+	jsr MMCWriteReg3
+	jmp DecBankLock1
+	jsr IncBankLock1
+	ldy #$00
+	lda ($33),y
+	rts
+
+	jsr IncBankLock2
+	ldx #$F0
+	stx RoomNumber
+	rts
+
+	pha
+	jsr IncBankLock2
+	pla
+	jsr $EB4D	; Some enemy type related code (Initial pos)
+	jmp IncBankLock1
+	jsr GetEnemyData	; Get enemy data
+	pha
+	jsr IncBankLock2
+	pla
+	jmp ChooseHandlerRoutine
+
+	lda $8400,y	; Pointer to Ridley's room definitions?
+	sta StructPtr
+	lda $8401,y	; Pointer to Ridley's room definitions+1
+	sta StructPtr+1
+	jmp DrawStruct	; Draw struct
+	lda $8500,y	; Pointer to Ridley's structure defs?
+	sta StructPtr
+	lda $8501,y	; Pointer to Ridley's structure defs+1
+	sta StructPtr+1
+	jmp DrawStruct
+	asl
+	rol MacroPtr+1
+	asl
+	rol MacroPtr+1
+	sta $11
+	lda MacroPtr+1
+	and #$03
+	ora #$80
+	sta MacroPtr+1
+	jmp Copy4Tiles	; Copy4Tiles
+	asl BankLock
+	bne +
+	jsr BitRoomDataBanked
++	rti
+	pha
+	bit RoomDataBanked
+	bvc +
+	lda CurrentBank
+	jsr MMCWriteReg3
++	jsr NMIVector	; Non-Maskable Interrupt
+	bit RoomDataBanked
+	bvc +
+	lda CurrentBank
+	clc
+	adc #$07
+	jsr MMCWriteReg3
++	pla
+	rts
+	pla
+	and #$0F
+	tax
+	beq +
+		skip 14
+	+
+	
+%org($CCBE,15)	; 0x3CCCE
+RunAnimTbl:
+	db $43,$61	; SamusRun, SamusRunPntUp
+
+%org($E758,15)	; 0x3E768
+-	cmp $AFE0,y	; Is it a special room?-->
+	beq +		; If so, branch to set flag to play item room music.
+	iny
+	cpy #$20
+	bne -		; Loop until all special room numbers are checked
+		skip 8
+	+
+
+;-------------------------------------
+
+%org($EA4C,15)	; 0x3EA5C
+	jsr SaveSamusData	; Jump to prepare to save Samus' data
+	nop
+	
+%org($EA99,15)	; 0x3EAA9
+; Hijack and jump to certain Load Game data sections?
+	bcs +
+	jmp $CA87
++	jmp $CA94
+
+%org($EAF4,15)	; 0x3EB04
+	jsr SaveSamusDataInSlot	; Jump to save Samus' data in appropriate slot
+	nop
+
+%org($EB20,15)	; 0x3EB30
+	jsr $CA71	; Jump to Load Game Data?
+
+%org($EDE4,15)	; 0x3EDF4
+; Handler routines jumped to by above code
+	dw $CA7C	; Pointer to some part of Load Game Data?
+
+; Modify the Draw structure routines
+%org($EF45,15)	; 0x3EF55
+DrawMacro:
+	jmp EraseAllGameData
+
+; Display of enemies routine
+%org($F345,15)	; 0x3F355
+UpdateEnemies:
+	ldx #$50
+	-	jsr DoOneEnemy
+		ldx PageIndex
+		jsr Xminus16	; Xminus16
+	bne -
+
+; Display of enemies routine
+%org($FFFA,15)	; 0x4000A
+	dw LoopUntilErased
+
+;-------------------------------------
 
 
 

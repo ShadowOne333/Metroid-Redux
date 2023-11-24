@@ -174,7 +174,7 @@ CheckMoveRight		= $E88B
 HexToDec		= $E198
 Reset			= $FFB0
 
-; Map data and 
+; Map data and its RAM
 MapRAM			= $7900	; Address of map data in RAM $7900
 MapData			= $9400	; Address of map data in bank $E
 

@@ -115,6 +115,7 @@ l_843B:
 	incbin "rom/Metroid.nes":$169CF..$16B34
 
 ; Overwrite certain bytes from the above Structure Definitions
+; These are changed due to the Mother hack having custom tiles in Ridley's area (doors)
 %org($843C,12)	; 0x3044C
 l_843C:
 	dw $8500,$85C3,$85C7,$85CB	; 00s in Saving 0.5.2
