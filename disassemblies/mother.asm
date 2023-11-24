@@ -308,6 +308,7 @@ l_8ACD:
 ; Graphics data, partial font "THE END"
 ; Modified in Mother to add/change to new graphics
 ;-------------------------------------
+
 %org($8D60,1)	; 0x04D70
 ; Copy over data from the original ROM starting at 0x05FD3
 	incbin "rom/Metroid.nes":$5FD2..$6288
@@ -443,18 +444,18 @@ EnemyFramePtrTbl1:
 ; Pointers to new addresses
 %org($9FC2,1)	; 0x05FD2
 l_9FC2:
-	dW $870B,$87,$8727,$8741,$8765
-	dW $87A0,$87,$87D2,$8809,$883F
-	dW $886C,$88,$889E,$88C2,$88FA
-	dW $8920,$89,$894C,$8978,$899C
-	dW $89C6,$89,$8A00,$8A27,$8A53
-	dW $8A76,$8A,$8A8E,$8ABB,$8ADC
-	dW $8B06,$8B,$8B46,$8B76,$8B9C
-	dW $8BD2,$8B,$8C01,$8C1C,$8C5C
-	dW $8C88,$8C,$8CB7,$8CE7,$8D11
-	dW $8D47,$8D,$8D95,$8DD7,$8E0A
-	dW $8E39,$8E,$8E62,$8E83,$8EB0
-	dW $8F15,$8F,$8F44,$8F61,$FFFF
+	dW $870B,$8727,$8741,$8765
+	dW $87A0,$87D2,$8809,$883F
+	dW $886C,$889E,$88C2,$88FA
+	dW $8920,$894C,$8978,$899C
+	dW $89C6,$8A00,$8A27,$8A53
+	dW $8A76,$8A8E,$8ABB,$8ADC
+	dW $8B06,$8B46,$8B76,$8B9C
+	dW $8BD2,$8C01,$8C1C,$8C5C
+	dW $8C88,$8CB7,$8CE7,$8D11
+	dW $8D47,$8D95,$8DD7,$8E0A
+	dW $8E39,$8E62,$8E83,$8EB0
+	dW $8F15,$8F44,$8F61,$FFFF
 
 ; Copy over data from the original ROM starting at 0x06453
 	incbin "rom/Metroid.nes":$6453..$6C94
@@ -481,7 +482,9 @@ l_AFE0:
 	db $FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF
 	db $FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF
 
+
 ;-------------------------------------
+;	   Bank 2 ($8000)
 ;	Animation changes (2)
 ;-------------------------------------
 
@@ -540,59 +543,47 @@ l_AFE0:
 	dw $8ED4,$8EF4,$8F02,$8F06
 
 ; Copy over data from the original ROM starting at 0x09DA4
-l_8E90:	; 0x08EA0
+l_8E90:		; 0x08EA0
 	incbin "rom/Metroid.nes":$9DA4..$A188
 
-; Possible animation data
-l_9284:
-	db $0A,$83,$92,$1B,$06,$02,$09
-	db $34,$00,$1C,$FF
+; Copy over data from the original ROM starting at 0x09DA4
+l_9284:		; 0x09294
+	incbin "rom/Metroid.nes":$A2E9..$A3BD
 
-	db $02,$09,$34,$00,$0B,$9D,$92,$16
-	db $05,$04,$81,$00,$1A,$06,$02,$09
-	db $34,$00,$1B,$06,$02,$09,$34,$00
-	db $1C,$FF
+; Force/change some room definition pointers from above
+%org($9275,2)	; 0x09285
+	dw $9283
+	skip 13
+	dw $929D
+	skip 24
+	dw $92A6
+	skip 7
+	dw $92AE
+	skip 6
+	dw $92B7
+	skip 7
+	dw $92D6
+	skip 29
+	dw $92DF
+	skip 7
+	dw $9308
+	skip 39
+	dw $9311
+	skip 7
+	dw $9324
+	skip 17
+	dw $9332
 
-	db $02,$09,$34,$00,$0C,$A6,$92,$1A
-	db $FF
+; Jump back where we left off
+%org($9346,2)	; 0x09356
+l_9346:
+; Copy over data from the original ROM starting at 0x0AD39
+	incbin "rom/Metroid.nes":$AD39..$AEFC
 
-	db $02,$07,$37,$00,$0D,$AE,$92,$16,$FF
-
-	db $04,$81,$00,$0E,$B7,$92,$12,$FF
-
-	db $02,$09,$34,$00,$0F,$D6,$92,$11
-	db $07,$02,$09,$34,$03,$00,$13,$06
-	db $02,$09,$34,$00,$14,$06,$02,$09
-	db $34,$00,$15,$FF
-
-	db $41,$8B,$E9,$51,$02,$9B,$00,$10
-	db $DF,$92,$0F,$FF
-
-	db $02,$03,$37,$00,$11,$08,$93,$16
-	db $04,$0A,$00,$18,$09,$31,$0B,$E9
-	db $41,$02,$9A,$00,$19,$09,$21,$8B
-	db $E9,$51,$02,$9A,$00,$1B,$06,$02
-	db $01,$37,$00,$1D,$05,$09,$A0,$00
-	db $1E,$FF
-
-	db $09,$B0,$00,$13,$11,$93,$1A,$FF
-	db $02,$08,$42,$00,$14,$24,$93,$0D
-	db $05,$09,$A0,$00,$0E,$05,$09,$B0
-	db $00,$1C,$FF
-
-	db $02,$09,$34,$00,$15,$32,$93,$12
-	db $06,$02,$06,$37,$00,$17,$FF
-
-	db $09,$A0,$00,$16,$FF,$FF,$13,$06,$02
-	db $09,$34,$00,$14,$06,$02,$09,$34
-	db $00,$19,$FF,$04,$04,$00,$0E,$FF
-
-l_9348:
-; Copy over data from the original ROM starting at 0x0AD3B
-	incbin "rom/Metroid.nes":$AD3B..$AEFC
-
+l_950A:
 	%fillto($9560,2,$00)
 
+l_9560:
 ; More pointers
 	dw $9C64,$9C88,$9C94,$9C8E
 	dw $9C9A,$AFBC,$9CC3,$9CC3
@@ -632,9 +623,442 @@ l_9C64:
 ; Copy over data from the original ROM starting at 0x0A3BD
 	incbin "rom/Metroid.nes":$A3BD..$ACC9
 
-	%fillto($AF3D,2,$00)
+	%fillto($AF2E,2,$00)
+
+; Copy over data from the original ROM starting at 0x0A2E9
+	incbin "rom/Metroid.nes":$A2E9..$A377
+
+; Force/change some room definition pointers from above
+%org($AF2F,2)	; 0x0AF3F
+	dw $AF3D
+	skip 13
+	dw $AF57
+	skip 24
+	dw $AF60
+	skip 7
+	dw $AF68
+	skip 6
+	dw $AF71
+	skip 7
+	dw $AF90
+	skip 29
+	dw $AF99
+	skip 7
+	dw $AFC2
+
+; Jump back where we left off
+%org($AFBC,2)	; 0x0AFCC
+; Copy over palette data from the original ROM at 0x0A
+	db $3F,$00,$20
+	db $0F,$20,$10,$00
+	db $0F,$28,$16,$04
+	db $0F,$16,$11,$04
+	db $0F,$35,$1B,$16
+	db $0F,$16,$19,$27
+	db $0F,$12,$30,$21
+	db $0F,$14,$23,$2C
+	db $0F,$16,$24,$37
+	db $00		; Palette PPU terminator byte
+	db $10,$05,$27,$04,$0F
+
+	db $FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF
+	db $FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF
+	db $FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF
+	db $FF,$FF,$FF
 
 ;-------------------------------------
+; 	Bank 3 ($C000)
+;-------------------------------------
+
+%org($85B5,3)	; 0x0C5C5
+; Samus on Elevator animation 1
+	db $03,$03,$04,$04,$03,$03,$05,$05,$FF,$FF
+	skip 5
+; Samus on Elevator animation 2
+	db $0C,$0C,$0D,$0D,$0C,$0C,$0E,$0E,$FF
+	skip 6
+; Samus on Elevator animation 3
+	db $40,$40,$41,$41,$40,$40,$42,$42,$FF
+
+; Implement a bunch of new pointers for the moved data
+%org($8D60,3)	; 0x0CD70
+	dw $8EFC,$8F01,$8F06,$8F0B
+	dw $8F18,$8F25,$8F2F,$8F34
+	dw $8F3A,$8F41,$8F47,$8F4C
+	dw $8F52,$8F59,$8F5F,$8F64
+	dw $8F69,$8F6E,$8F75,$8F85
+	dw $8F93,$8F9F,$8FAC,$8FBB
+	dw $8FC5,$8FD0,$8FD7,$8FE0
+	dw $8FF0,$9000,$9010,$9014
+	dw $9014,$9014,$9014,$9014
+	dw $9014,$9014,$9014,$9014
+	dw $9014,$9014,$9014,$9014
+	dw $9014,$9014,$9014,$9014
+	dw $9014,$9014,$9014,$9014
+	dw $9014,$9014,$9014,$9014
+	dw $9014,$9014,$9014,$9014
+	dw $9014,$9014,$9014,$9014
+	dw $9014,$9014,$9014,$9014
+	dw $9014,$9014,$9014,$9014
+	dw $9014,$9014,$9014,$9014
+	dw $9014,$9014,$9014,$9014
+	dw $9014,$9014,$9014,$9014
+	dw $9014,$9014,$9014,$9014
+	dw $9014,$9014,$9014,$9014
+	dw $9014,$9014,$9014,$9014
+	dw $9014,$9014,$9022,$903C
+	dw $903C,$903C,$903C,$903C
+	dw $903C,$903C,$903C,$903C
+	dw $903C,$903C,$903C,$903C
+	dw $903C,$903C,$903C,$903C
+	dw $903C,$903C,$903C,$903C
+	dw $903C,$903C,$903C,$903C
+	dw $903C,$903C,$903C,$903C
+	dw $903C,$9042,$9047,$9047
+	dw $9047,$9047,$9047,$9047
+	dw $9047,$9047,$8E94,$8E96
+	dw $8EAE,$8EC0,$8EC6,$8ED2
+	dw $8ED8,$8ED8,$8ED8,$8ED8
+	dw $8ED8,$8EF8,$8EF8,$8EFC
+	dw $8EFC,$8EFC
+	
+; Import data from 0x0E570
+	incbin "rom/Metroid.nes":$E570..$E728
+
+; Implement palette data
+	db $3F,$00,$20	; PPU address and length
+	db $0F,$20,$10,$00
+	db $0F,$20,$11,$00
+	db $0F,$16,$20,$00
+	db $0F,$20,$10,$00
+	db $0F,$16,$19,$27
+	db $0F,$12,$30,$21
+	db $0F,$27,$16,$30
+	db $0F,$16,$2A,$37
+	db $00
+
+	db $3F,$12,$02	; PPU address and length
+	db $19,$27,$00
+
+	db $3F,$12,$02	; PPU address and length
+	db $2C,$27,$00
+
+	db $3F,$12,$02	; PPU address and length
+	db $19,$35,$00
+
+	db $3F,$12,$02	; PPU address and length
+	db $2C,$24,$00
+
+	db $3F,$0A,$01	; PPU address and length
+	db $27,$00
+
+	db $3F,$0A,$01	; PPU address and length
+	db $20,$00
+
+	db $3F,$00,$11	; PPU address and length
+	db $0F,$20,$16,$00
+	db $0F,$20,$11,$00
+	db $0F,$20,$16,$00
+	db $0F,$20,$10,$00
+	db $0F,$00
+
+	db $3F,$00,$11	; PPU address and length
+	db $20,$02,$16,$00
+	db $20,$02,$11,$00
+	db $20,$02,$16,$00
+	db $20,$02,$10,$00
+	db $20,$00
+
+	db $3F,$00,$60	; PPU address and length
+	db $20,$00
+
+	db $3F,$11,$03	; PPU address and length
+	db $04,$09,$07,$00
+
+	db $3F,$11,$03	; PPU address and length
+	db $05,$09,$17,$00
+
+	db $3F,$11,$03	; PPU address and length
+	db $06,$0A,$26,$00
+
+	db $3F,$11,$03	; PPU address and length
+	db $16,$19,$27,$00
+
+	db $3F,$00,$04	; PPU address and length
+	db $0F,$30,$30,$21
+	db $00
+
+	db $3F,$10,$04	; PPU address and length
+	db $0F,$15,$34,$17
+	db $00
+
+	db $3F,$10,$04	; PPU address and length
+	db $0F,$15,$34,$19
+	db $00
+
+	db $3F,$10,$04	; PPU address and length
+	db $0F,$15,$34,$28
+	db $00
+
+	db $3F,$10,$04	; PPU address and length
+	db $0F,$15,$34,$29
+	db $00
+
+	db $03,$0D,$91	; PPU address and length
+	db $01,$FF
+
+; Import data from 0x0E850
+	incbin "rom/Metroid.nes":$E850..$E8BF
+
+; Force/change some room definition pointers from above
+%org($910E,3)	; 0x0D11E
+	dw $9115
+	skip 6
+	dw $9125
+	skip 14
+	dw $912C
+	skip 5
+	dw $9133
+	skip 5
+	dw $913A
+
+; Jump back where we left off
+%org($9179,3)	; 0x0D189
+; Import data from 0xEECD
+	incbin "rom/Metroid.nes":$EECD..$EF59
+
+; Pointers for the moved data
+	dw $9245,$9258,$927F,$9298
+	dw $929F,$92A6,$92A9,$92BA
+	dw $92D3,$92E4,$92F5,$92FF
+	dw $9328,$9355,$935C,$936B
+	dw $936E,$9377,$9390,$9395
+	dw $939A,$93C8,$93DB,$93F7
+	dw $940C,$942D,$943E,$9449
+	dw $944D,$9450,$945B,$9465
+
+; Import data from 0x0EC26
+	incbin "rom/Metroid.nes":$EC26..$EE59
+
+	%fillto($9560,3,$00)
+
+; Even more pointers to moved areas' new addresses
+	dw $904C,$9070,$907C,$9076
+	dw $9082,$AFBC,$9088,$908D
+	dw $9092,$90A7,$90BC,$90C1
+	dw $90C1,$90C1,$90C1,$90C1
+	dw $90C1,$90C1,$90C1,$90C1
+	dw $90C8,$90CF,$90D6,$90DD
+	dw $90E5,$90ED,$90F5,$90FD
+	dw $9105
+
+	dw $A42C,$8400,$8000
+	dw $8D60,$8E60,$8E74
+	
+	nop	; Clear leftover byte from original LDA $06
+
+
+%org($A357,3)	; 0x0E367
+; Change one byte in Ridley's Room #$07 attribute table data, room object data
+	db $F8
+
+%org($A3FC,3)	; 0x0E40C
+; Change Ridley's Room #$0A attribute table data, room object data
+	db $A1,$A1,$A2,$A2,$A3,$A3,$A4,$A4,$A5,$A5
+
+%org($A42C,3)	; 0x0E43C
+; Pointers for moved areas' new addresses
+	dw $8697,$86A5,$86BF,$86F4
+	dw $8723,$8758,$876F,$878A
+	dw $87A5,$87C9,$87EC,$882D
+	dw $886F,$88A8,$88DD,$890F
+	dw $8947,$8979,$89A2,$89CB
+	dw $89EC,$FFFF
+
+; Import data from 0xE8C1
+	incbin "rom/Metroid.nes":$E8C1..$EC26
+
+	%fillto($AF49,3,$00)
+
+%org($AF8C,3)	; 0x0EF9C
+; Import data from E84B
+	incbin "rom/Metroid.nes":$E84B..$E87B
+
+; Force/change some room definition pointers from above
+%org($AF8D,3)	; 0x0EF9D
+	dw $AF94
+	skip 6
+	dw $AF9C
+	skip 6
+	dw $AFAC
+	skip 14
+	dw $AFB3
+	skip 5
+	dw $AFBA
+	skip 5
+	dw $AFC1	; This one gets cut-off for some reason
+
+; Jump back where we left off
+%org($AFBC,3)	; 0x0EFCC
+	db $3F,$00,$20
+	db $0F,$20,$16,$00
+	db $0F,$20,$11,$00
+	db $0F,$16,$27,$00
+	db $0F,$20,$10,$00
+	db $0F,$16,$19,$27
+	db $0F,$12,$30,$21
+	db $0F,$27,$16,$30
+	db $0F,$16,$2A,$37
+	db $00
+
+	db $FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF
+	db $FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF
+	db $FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF
+	db $FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF
+
+;-------------------------------------
+; 	Bank 4 ($10000)
+;-------------------------------------
+
+%org($85B5,4)	; 0x0105C5
+; Samus on Elevator animation 1
+	db $03,$03,$04,$04,$03,$03,$05,$05,$FF,$FF
+	skip 5
+; Samus on Elevator animation 2
+	db $0C,$0C,$0D,$0D,$0C,$0C,$0E,$0E,$FF
+	skip 6
+; Samus on Elevator animation 3
+	db $40,$40,$41,$41,$40,$40,$42,$42,$FF
+
+%org($8D60,4)	; 0x010D70
+; Update pointers for the moved data's new addresses
+	dw $8F42,$8F47,$8F4C,$8F51
+	dw $8F51,$8F51,$8F51,$8F51
+	dw $8F51,$8F51,$8F51,$8F51
+	dw $8F51,$8F51,$8F51,$8F51
+	dw $8F51,$8F51,$8F51,$8F51
+	dw $8F51,$8F51,$8F51,$8F51
+	dw $8F51,$8F51,$8F5F,$8F6D
+	dw $8F79,$8F87,$8F95,$8FA1
+	dw $8FAA,$8FB4,$8FBE,$8FC7
+	dw $8FD1,$8FDB,$8FDB,$8FDB
+	dw $8FE9,$8FF0,$8FF9,$8FF9
+	dw $8FF9,$8FF9,$8FF9,$8FF9
+	dw $8FF9,$8FF9,$8FF9,$8FF9
+	dw $8FF9,$8FF9,$8FF9,$8FF9
+	dw $900D,$9021,$902C,$9037
+	dw $9040,$9049,$9054,$9054
+	dw $9054,$9054,$9054,$9054
+	dw $9054,$9054,$9054,$9054
+	dw $9054,$9054,$9054,$9054
+	dw $9054,$9054,$9054,$9054
+	dw $9054,$9054,$9054,$9054
+	dw $9054,$9054,$9054,$9054
+	dw $9054,$905C,$9064,$906C
+	dw $9074,$907C,$9084,$908C
+	dw $9094,$909C,$90AA,$90C4
+	dw $90C4,$90C4,$90C4,$90CC
+	dw $90D4,$90DC,$90E4,$90EC
+	dw $90F4,$90FC,$9104,$910C
+	dw $9114,$911C,$9124,$912C
+	dw $9134,$913C,$9144,$9144
+	dw $9144,$9144,$9144,$9144
+	dw $9144,$9144,$9144,$9144
+	dw $9144,$914C,$9151,$9151
+	dw $9151,$9151,$9151,$9151
+	dw $9151,$9151,$9156,$9156
+	dw $9156,$9156,$9156,$9156
+	dw $9160,$916A,$917F,$9194
+	dw $91A9,$9D61,$9D6B,$8EAE
+	dw $8EB0,$9D3F,$8EE0,$8EE0
+	dw $8EE0,$8EF0,$8EFC,$8F04
+	dw $8F10,$8F10,$8F30,$8F3E
+	dw $8F3E,$8F3E,$8F3E
+
+; Import data from 0x010555
+	incbin "rom/Metroid.nes":$11E55..$12111
+
+l_916A:		; 0x1117A
+; Custom PPU transfers
+	db $22,$14,$0C	; PPU address and length
+	db $C9,$EA,$FA,$C5,$C6,$C7,$D5,$D6
+	db $D7,$E5,$E6,$E7,$FB,$EB,$F5,$F6
+	db $F7,$FF
+
+	db $22,$14,$0C	; PPU address and length
+	db $C9,$EA,$FA,$C5,$C6,$C7,$D5,$D6
+	db $D7,$E5,$E6,$E7,$FB,$EB,$E8,$E9
+	db $F9,$FF
+
+	db $62,$14,$0C	; PPU address and length
+	db $C9,$EA,$FA,$C5,$C6,$C7,$D5,$D6
+	db $D7,$E5,$E6,$E7,$FB,$EB,$F5,$F6
+	db $F7,$FF
+
+	db $62,$14,$0C	; PPU address and length
+	db $C9,$EA,$FA,$C5,$C6,$C7,$D5,$D6
+	db $D7,$E5,$E6,$E7,$FB,$EB,$E8,$E9
+	db $F9,$FF
+
+	db $3F,$00,$20
+	db $0F,$20,$10,$00
+	db $0F,$28,$19,$1A
+	db $0F,$28,$16,$04
+	db $0F,$23,$11,$02
+	db $0F,$16,$19,$27
+	db $0F,$12,$30,$21
+	db $0F,$27,$1B,$36
+	db $0F,$17,$22,$31
+	db $00		; Palette PPU terminator byte
+
+l_91E2:
+; Import data from 0x010555
+	incbin "rom/Metroid.nes":$12189..$121E5
+	incbin "rom/Metroid.nes":$1227D..$122C1
+
+; Force/change some room definition pointers from above
+%org($923F,4)	; 0x1124F
+	dw $9246
+	skip 6
+	dw $924E
+	skip 6
+	dw $925D
+	skip 13
+	dw $9266
+	skip 7
+	dw $926F
+	skip 7
+	dw $9278
+	skip 7
+	dw $927F
+
+; Jump back where we left off
+%org($9282,4)	; 0x11292
+; VERIFY 
+	db $80,$FF,$02,$08,$BE,$00
+	dw $943F,$9448
+; Import data from 0x010555
+	incbin "rom/Metroid.nes":$12A7B..$12C42
+
+	%fillto($9560,4,$00)
+
+; Update pointers for the moved data's new addresses
+	dw $91BE,$91E2
+	; PENDING
+l_95A6:
+
+;-------------------------------------
+; 	Bank 12 ($30000)
+;-------------------------------------
+
+%org($8000,12)	; 0x30010
+	db $FF,$FF,$F0,$F0,$F1,$F1,$F1,$F1
+	db $F2,$FF,$F2,$FF,$FF,$F3,$FF,$F3
+; Another modified part from Ridley's code?
+	incbin "rom/Metroid.nes":$16B43..$16C33
+
+	db $A0,$A0	; Unknown what these are
+
 
 %org($8D1E,12)	; 0x30D2E
 ; Another modified part from Ridley's code?
@@ -645,10 +1069,22 @@ l_9C64:
 	db $00		; Blanked out in Mother
 
 ;-------------------------------------
+; 	EDITROID data bank
+;-------------------------------------
+
+; Editroid ACSII string
+%org($8000,14)	; 0x38010
+	cleartable
+	db "EDITROID"
+	pushtable : incsrc "code/text/Text.tbl"	; Restore our TBL
+
+; Custom Editroid tables
+; We'll import the data as a binary file to save writing space, it's just a bunch of 14s and 00s with some 08s thrown in
+	incbin "EditroidData.bin"
 
 ; DONE AUTOMATICALLY WITH ASAR'S EXPANSION METHOD, NOT NEEDED!!!
 ;%org($99A8,14)	; 0x399B8
-	;%fillto($BFFF,14,$00)
+	;%fillto($BFFD,13,$00)	; Fill with 00s
 
 %org($BFFE,14)	; 0x3C00E
 	dw l_C65A	; 5A C6 (?)
@@ -656,8 +1092,9 @@ l_9C64:
 ;-------------------------------------
 ;	Bank 7 changes 
 ;-------------------------------------
-; Bank 7 was copied to Bank 15 through 'dd' in Linux, only the custom code will be implemented afterwards
+; Bank 7 was copied to Bank 15 in main.asm, only the custom code will be implemented afterwards
 
+; Mapper load?
 %org($C06D,15)	; 0x3C07D
 	lda #%00011110	; Mapper #1 (MMC1)
 			; Verticle mirroring.
@@ -666,12 +1103,14 @@ l_9C64:
 			; 16KB PRGROM switching enabled
 			; 8KB CHRROM switching enabled
 
+; 
 %org($C106,15)	; 0x3C116
 	jmp l_C672
 l_C109:
 	skip 10
 	rts
 
+; 
 %org($C4F8,15)	; 0x3C508
 	;sta $28	; SwitchUpperBits
 	nop #2	; NOPs in the original Mother code (why?)
