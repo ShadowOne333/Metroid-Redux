@@ -638,6 +638,7 @@ l_9C64:
 	db $00,$00,$00,$00,$00,$00,$00	; Blanked out in Mother
 %org($8D8D,12)	; 0x30D9D
 	db $00		; Blanked out in Mother
+
 ;-------------------------------------
 
 ; DONE AUTOMATICALLY WITH ASAR'S EXPANSION METHOD, NOT NEEDED!!!
