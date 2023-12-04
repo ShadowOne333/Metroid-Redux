@@ -3,7 +3,8 @@
 ;-------------------------------------
 
 ; Pointers to Kraid's room definitions at 0x2CXXX
-%org($9E1B,4)	; 0x11E2B
+;%org($9E1B,4)	; 0x11E2B
+%org($9E1C,4)	; 0x11E2C
 ; Enemy frame pointer table 2
 	dw $8976,$89B2,$89E4,$8A08,$8A42
 ; Enemy placement pointer table
@@ -13,7 +14,8 @@
 
 ;-------------------------------------
 
-%org($A1A2,4)	; 0x121B2
+;%org($A1A2,4)	; 0x121B2
+%org($A1A3,4)	; 0x121B3
 l_A1A2:
 ; Copy Kraid's original room definitions into this area
 	incbin "rom/Metroid.nes":$12657..$12A7B
@@ -42,7 +44,7 @@ l_A1A2:
 	dw $8C4B,$8C89,$8CBC,$8CDA
 	dw $8D04
 l_9D44:
-	db $FFFF
+	dw $FFFF
 l_9D46:
 ; Copy Ridley's original room definitions into this area
 	incbin "rom/Metroid.nes":$16251..$169CF
