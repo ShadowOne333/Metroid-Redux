@@ -1366,10 +1366,299 @@ l_1516A:		; 0x1517A
 
 ;-------------------------------------
 ; 	Bank 7 ($1C000)
+; Graphics data (graphics.asm)
 ;-------------------------------------
 
-%org($8000,7)	; 0x1C010
+; This bank has been implemented inside the graphics.asm file
 
+;-------------------------------------
+; 	Bank 8 ($20000)
+;-------------------------------------
+
+%org($8000,8)	; 0x20010
+; Import data from 0x06F00
+	incbin "rom/Metroid.nes":$06F00..$07000
+
+; Force/change some data from imported section above
+%org($8010,8)	; 0x20020
+	db $F2,$FF,$F2,$FF,$FF,$F3,$FF,$F3
+
+; Jump back where we left off
+%org($8100,8)	; 0x20110
+	db $A0,$A0,$A1,$A1,$A2,$A2,$A3,$A3
+	db $A4,$A4,$A5,$A5,$F4,$F5,$F4,$F5
+	db $F6,$F7,$F6,$F7,$A8,$A8,$A9,$A9
+	db $AA,$AA,$AB,$AB,$AC,$AC,$AD,$AD
+	db $F8,$F9,$FF,$FF,$FA,$FB,$FF,$FF
+	db $BB,$BB,$66,$66
+
+; New pointers for moved data
+	dw $933F,$9350,$9375,$9378
+	dw $937E,$938B,$939B,$93A5
+	dw $93AA,$93BF,$93D4,$93DA
+	dw $93DD,$93F1,$9402,$9417
+	dw $9420,$9424,$9437,$9442
+	dw $9445,$9450,$945A,$945D
+	dw $9470,$9473,$9476,$947F
+
+; Import data from 0x06C94
+	incbin "rom/Metroid.nes":$06C94..$06F00
+
+	%fillto($8400,8,$00)
+
+; New pointers for moved data
+	dw $8470,$8483,$849C,$84B5
+	dw $84BC,$84C3,$84C7,$84D2
+	dw $84DF,$84EB,$84F1,$84F6
+	dw $8506,$850A,$8514,$8539
+	dw $8543,$8556,$856B,$857A
+	dw $8584,$858E,$8599,$85AA
+	dw $85CF,$85D2,$85D8,$85E5
+	dw $85F5,$85FF,$8604,$8619
+	dw $862E,$8634,$8637,$864B
+	dw $865C,$8671,$867A,$867E
+	dw $8691,$869C,$869F,$86AA
+	dw $86B4,$86B7,$86CA,$86CD
+	dw $86D0,$86D9,$86DC,$86E9
+	dw $86F6,$86FF,$8702,$8705
+
+; Import data from 0x06C94
+	incbin "rom/Metroid.nes":$06C94..$06F00
+
+; Force/change some structure definitions modifications above
+%org($84B6,8)	; 0x204C6
+	db $40,$01,$41,$01,$42,$FF,$01,$45
+	db $01,$46,$01,$47
+
+; Jump back where we left off
+%org($86DC,8)	; 0x206EC
+	db $01,$43,$01,$43,$01,$43,$01,$43
+	db $01,$43,$01,$43,$FF,$01,$44,$01
+	db $44,$01,$44,$01,$44,$01,$44,$01
+	db $44,$FF,$01,$20,$01,$20,$01,$17
+	db $01,$17,$FF,$01,$33,$FF,$01,$20
+	db $FF,$04,$48,$49,$48,$49,$FF,$02
+	db $40,$01,$02,$48,$01,$02,$50,$03
+	db $00,$5F,$03,$00,$52,$37,$02,$56
+	db $37,$02,$5A,$37,$02,$FD,$02,$A1
+	db $02,$B1,$FF,$02,$A9,$33,$00,$A6
+	db $32,$00,$06,$32,$00,$09,$33,$00
+	db $87,$02,$02,$07,$02,$02,$56,$32
+	db $00,$59,$33,$00,$FF
+
+; Import data from 0x06C94
+	incbin "rom/Metroid.nes":$0646C..$06680
+
+; Pointer fixes for the imported code above
+%org($8777,8)	; 0x20787
+	dw $8B00
+%org($87AF,8)	; 0x207BF
+	dw $5E00
+%org($87DE,8)	; 0x207EE
+	dw $5700
+	skip 4
+	dw $8000
+%org($88DD,8)	; 0x208ED
+	dw $6000
+
+; Jump back where we left off
+%org($88FB,8)	; 0x2090B
+; Import data from 0x06C94
+	incbin "rom/Metroid.nes":$06620..$068F9
+
+; Pointer? fixes for the imported code above
+%org($88FB,8)	; 0x2090B
+	dw $3399,$9600
+	db $32
+	skip 18
+	dw $8000
+	skip 24
+	dw $8000
+%org($8958,8)	; 0x20968
+	dw $8C00
+%org($89D5,8)	; 0x209E5
+	dw $5F00
+	skip 1
+	dw $8000
+%org($8A2D,8)	; 0x20A3D
+	dw $0A03
+	skip 1
+	dw $5003
+	skip 1
+	dw $8000
+%org($8A56,8)	; 0x20A66
+	dw $0703
+	skip 1
+	dw $0E03
+	skip 1
+	dw $5F03
+	skip 1
+	dw $8A00
+%org($8A79,8)	; 0x20A89
+	dw $0803
+	skip 1
+	dw $D003
+%org($8AA0,8)	; 0x20AB0
+	dw $BA03
+%org($8ABE,8)	; 0x20ACE
+	dw $0803
+	skip 1
+	dw $B003
+%org($8AEE,8)	; 0x20AFE
+	dw $B303
+%org($8AF7,8)	; 0x20B07
+	dw $C803
+	skip 1
+	dw $D003
+%org($8B15,8)	; 0x20B25
+	dw $5F00
+	skip 1
+	dw $6400
+%org($8B82,8)	; 0x20B92
+	dw $8000
+	skip 5
+	dw $2DD0
+	dw $D802
+	skip 2
+	dw $3495
+	dw $FD00
+%org($8B9F,8)	; 0x20BAF
+	dw $0403
+	skip 4
+	dw $0A03
+
+; Jump back where we left off
+%org($8BD2,8)	; 0x20BE2
+	dw $9900,$0033,$3296
+; Import data from 0x06C94
+	incbin "rom/Metroid.nes":$068F7..$06C34
+
+; Pointer? fixes for the imported code above
+%org($8BDB,8)	; 0x20BEB
+	dw $0103
+%org($8BED,8)	; 0x20BFD
+	dw $6A00
+	skip 1
+	dw $4D03
+%org($8C37,8)	; 0x20C47
+	dw $5F00
+	skip 1
+	dw $7400
+%org($8C68,8)	; 0x20C78
+	dw $8000
+%org($8C97,8)	; 0x20CA7
+	dw $8C00
+%org($8E16,8)	; 0x20E26
+	dw $8000
+%org($8E45,8)	; 0x20E55
+	dw $8700
+	skip 5
+	dw $26C3,$D001,$022D,$2DD8
+	skip 1
+	dw $349A,$FD00
+%org($8EE1,8)	; 0x20EF1
+	dw $0450,$5300
+	skip 4
+	dw $6400
+
+; Continue where we left off
+%org($8F15,8)	; 0x20F25
+	dw $9900,$0033,$3296
+
+; Import data from 0x06C94
+	incbin "rom/Metroid.nes":$06C34..$06C94
+
+; Pointer? fixes for the imported code above
+%org($8F30,8)	; 0x20F40
+	dw $8000
+%org($8F6A,8)	; 0x20F7A
+	dw $5E00
+
+; Continue where we left off, unknown what this is
+%org($8F7B,8)	; 0x20F8B
+	db $02,$B1,$FF,$FF,$FF,$FF,$FF,$B1
+	db $FF,$FF,$FF,$B1,$FF,$FF,$B1,$FF
+	db $FF,$FF,$FF,$B1,$FF,$FF,$FF,$FF
+	db $FF,$FF,$FF,$FF,$FF,$B1,$FF,$FF
+	db $FF,$FF,$B1,$FF,$FF,$FF,$FF,$FF
+	db $FF,$B1,$FF,$FF,$FF,$FF,$B1,$FF
+	db $B1,$FF,$FF,$FF,$FF,$FF,$B1
+
+	%fillto($8FF0,8,$FF)
+	%fillto($9000,8,$00)
+
+; The rest of the bank has been implemented inside the graphics.asm file, since everything from 0x21010 up to 0x24010 are graphics
+
+;-------------------------------------
+; 	Bank 9 ($24000)
+;-------------------------------------
+
+%org($8000,9)	; 0x24010
+; Import data from 0x0AEFC
+	incbin "rom/Metroid.nes":$0AEFC..$0B000
+
+%org($8010,9)	; 0x24020
+	dw $FFF2,$FFF2,$F3FF,$F3FF
+
+; Continue where we left off
+%org($8100,9)	; 0x24110
+	db $A0,$A0,$A1,$A1,$A2,$A2,$A3,$A3
+	db $A4,$A4,$A5,$A5,$F4,$F5,$F4,$F5
+	db $F6,$F7,$F6,$F7,$A8,$A8,$A9,$A9
+	db $AA,$AA,$AB,$AB,$AC,$AC,$AD,$AD
+	db $F8,$F9,$FF,$FF,$FA,$FB,$FF,$FF
+	db $BB,$BB,$66,$66
+
+; New pointers for moved data
+	dw $A2E3,$A30A,$A337,$A36A
+	dw $A394,$A3C1,$A3FF,$A431
+	dw $A463,$A48D,$A4B7,$A4F5
+	dw $A527,$A55F,$A58C,$A5C5
+	dw $A5EC,$A628,$A65D,$A692
+	dw $A6C5,$A6FA,$A72A,$A751
+
+; Import data from 0x0AEFC
+	incbin "rom/Metroid.nes":$0A3BB..$0A65F
+
+; New pointers for moved data
+	dw $846A,$847D,$8496,$84AF
+	dw $84B6,$84BD,$84C1,$84C7
+	dw $84D7,$84DC,$84E2,$84EA
+	dw $84FF,$8508,$8512,$851D
+	dw $8529,$852C,$8536,$8539
+	dw $854D,$8562,$8568,$856E
+	dw $8577,$8580,$8593,$85A8
+	dw $85BD,$85CE,$85D4,$85D7
+	dw $85E0,$85EB,$85F1,$8606
+	dw $860A,$8615,$861E,$8633
+	dw $8636,$863F,$8642,$8645
+	dw $864B,$8658,$8662,$8677
+	dw $868A,$869D,$86AA,$86B7
+	dw $86BA
+
+; Import data from 0x0AEFC
+	incbin "rom/Metroid.nes":$0ACC9..$0B000
+
+; Pointer fixes for the imported code above
+%org($84B0,9)	; 0x244C0
+	dw $0140,$0141,$FF42,$4501
+	dw $4601,$4701
+%org($869D,9)	; 0x246AD
+	db $01,$43,$01,$43,$01,$43,$01,$43
+	db $01,$43,$01,$43,$FF,$01,$44,$01
+	db $44,$01,$44,$01,$44,$01,$44,$01
+	db $44,$FF,$01,$10
+	db $FF,$04,$48,$49,$48,$49,$FF,$02
+	db $40,$01,$02,$48,$01,$02,$50,$04
+	db $00,$5F,$04,$00,$52,$34,$01,$56
+	db $34,$01,$5A,$34,$01,$FD,$02,$A1
+	db $02,$B1,$FF,$02,$09,$32,$00,$06
+	db $31,$00,$A6,$31,$00,$07,$02,$02
+	db $87,$02,$02,$56,$31,$00,$59,$32
+	db $00,$A9,$32,$00,$FF
+
+; Import data from 0x0AEFC
+	incbin "rom/Metroid.nes":$0A3D6..$0A700
 
 ;-------------------------------------
 ; 	Bank 12 ($30000)
@@ -1411,6 +1700,7 @@ l_1516A:		; 0x1517A
 
 %org($BFFE,14)	; 0x3C00E
 	dw l_C65A	; 5A C6 (?)
+
 
 ;-------------------------------------
 ;	Bank 7 changes 
