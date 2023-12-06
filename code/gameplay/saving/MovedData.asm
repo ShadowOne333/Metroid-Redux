@@ -75,9 +75,11 @@ l_A58E:
 
 ;-------------------------------------
 
-%org($8976,11)	; 0x2C986
+;%org($8976,11)	; 0x2C986
+%org($8977,11)	; 0x2C987
 ; Copy Kraid's original room definitions into this area
-	incbin "rom/Metroid.nes":$12657..$12A7B
+;	incbin "rom/Metroid.nes":$12657..$12A7B
+	incbin "rom/Metroid.nes":$12658..$12A7B
 
 ;-------------------------------------
 

@@ -1617,7 +1617,7 @@ l_1516A:		; 0x1517A
 	dw $A5EC,$A628,$A65D,$A692
 	dw $A6C5,$A6FA,$A72A,$A751
 
-; Import data from 0x0AEFC
+; Import data from 0x0A3BB
 	incbin "rom/Metroid.nes":$0A3BB..$0A65F
 
 ; New pointers for moved data
@@ -1636,7 +1636,7 @@ l_1516A:		; 0x1517A
 	dw $868A,$869D,$86AA,$86B7
 	dw $86BA
 
-; Import data from 0x0AEFC
+; Import data from 0x0ACC9
 	incbin "rom/Metroid.nes":$0ACC9..$0B000
 
 ; Pointer fixes for the imported code above
@@ -1657,8 +1657,347 @@ l_1516A:		; 0x1517A
 	db $87,$02,$02,$56,$31,$00,$59,$32
 	db $00,$A9,$32,$00,$FF
 
-; Import data from 0x0AEFC
-	incbin "rom/Metroid.nes":$0A3D6..$0A700
+; Import data from 0x0A3D6
+	incbin "rom/Metroid.nes":$0A3D6..$0A407
+	db $07,$02,$02
+; Import data from 0x0A407
+	incbin "rom/Metroid.nes":$0A407..$0A483
+
+	%fillto($902C,9,$FF)
+
+; Fixes for the imported code above
+%org($86FA,9)	; 0x2470A
+	db $03
+	skip 2
+	db $09
+%org($873A,9)	; 0x2474A
+	dw $5F00
+	skip 1
+	dw $8000
+%org($877A,9)	; 0x2478A
+	dw $6300
+
+; Continue where we left off
+%org($87A6,9)	; 0x247B7
+	dw $9900,$0032,$3196
+
+; Import data from 0x0A483
+	incbin "rom/Metroid.nes":$0A483..$0ACC9
+
+; Fixes for the imported code above
+%org($87C1,9)	; 0x247D1
+	dw $4702
+	skip 7
+	dw $4F02
+	skip 4
+	dw $6B00
+%org($8875,9)	; 0x24885
+	dw $8600
+%org($88E6,9)	; 0x248F6
+	dw $8000
+%org($8921,9)	; 0x24931
+	dw $5E00
+%org($8986,9)	; 0x24996
+	dw $5F00
+	skip 1
+	dw $8000
+%org($89C3,9)	; 0x249D3
+	dw $5E00
+%org($89F2,9)	; 0x24A02
+	dw $8000
+%org($8A27,9)	; 0x24A37
+	dw $8C00
+%org($8A56,9)	; 0x24A66
+	dw $5C00
+%org($8A91,9)	; 0x24AA1
+	dw $8000
+%org($8AC6,9)	; 0x24AD6
+	dw $6900
+%org($8C57,9)	; 0x24C67
+	dw $8000
+%org($8C92,9)	; 0x24CA2
+	dw $8C00
+%org($8CC4,9)	; 0x24CD4
+	dw $8000
+%org($8D4D,9)	; 0x24D5D
+	dw $8C00
+%org($8D85,9)	; 0x24D95
+	dw $8000
+%org($8DBD,9)	; 0x24DCD
+	dw $8D00
+%org($8EBB,9)	; 0x24ECB
+	dw $8000
+%org($8EED,9)	; 0x24EFD
+	dw $8000
+%org($8F55,9)	; 0x24F65
+	dw $8C00
+
+; Some $03s at the end alongside the $FFs, unknown what they are for
+%org($8FF3,9)	; 0x25003
+	db $03
+	skip 4
+	db $03
+	skip 4
+	db $03
+	skip 7
+	db $03
+	skip 4
+	db $03
+	skip 4
+	db $03
+	skip 4
+	db $03
+	skip 4
+	db $03
+	skip 4
+	db $03
+
+; Blank out the rest of the bank
+%org($902C,9)	; 0x2503C
+	%fillto($BFFF,9,$00)
+
+;-------------------------------------
+; 	Bank 10 ($28000)
+;-------------------------------------
+
+%org($8000,10)	; 0x28010
+; Import data from 0x0EE59
+	incbin "rom/Metroid.nes":$0EE59..$0EF49
+
+; Fix the some bytes from the import above
+%org($8000,10)	; 0x28010
+	db $F1,$F1,$F1,$F1,$FF,$FF,$F0,$F0
+%org($8010,10)	; 0x28020
+	dw $FFF2,$FFF2,$F3FF,$F3FF,$79FF
+
+; Continue where we left off
+%org($80F0,10)	; 0x28100
+	db $A0,$A0,$A1,$A1,$A2,$A2,$A3,$A3
+	db $A4,$A4,$A5,$A5,$F4,$F5,$F4,$F5
+	db $F6,$F7,$F6,$F7,$A8,$A8,$A9,$A9
+	db $AA,$AA,$AB,$AB,$AC,$AC,$AD,$AD
+	db $F8,$F9,$FF,$FF,$FA,$FB,$FF,$FF
+	db $BB,$BB,$66,$66
+
+; New pointers for moved data
+	dw $935C,$936B,$936E,$9377
+	dw $9390,$9395,$939A,$93C8
+	dw $93DB,$93F7,$940C,$942D
+	dw $943E,$9449,$944D,$9450
+	dw $945B,$9465
+
+; Import data from 0x0EC26
+	incbin "rom/Metroid.nes":$0EC26..$0EE59
+
+; Blank out up to 0x28410
+	%fillto($8400,10,$00)
+
+; New pointers for moved data
+	dw $8446,$8459,$8480,$8499
+	dw $84A0,$84A7,$84AA,$84BB
+	dw $84D4,$84E5,$84F6,$8500
+	dw $8529,$8556,$855D,$856C
+	dw $856F,$8578,$8591,$8596
+	dw $859B,$85C9,$85DC,$85F8
+	dw $860D,$862E,$863F,$864A
+	dw $864E,$8651,$865C,$8666
+	dw $8679,$8686,$8693
+
+; Import data from 0x0EC26
+	incbin "rom/Metroid.nes":$0EC26..$0EE59
+
+; Fix data from the import above
+%org($8499,10)	; 0x284A9
+	dw $3C01,$3D01,$3E01
+	db $FF
+	dw $4101,$4201,$4301
+	db $FF
+
+; Continue where we left off
+%org($8679,10)	; 0x28689
+; Import data from 0x0E88F
+	incbin "rom/Metroid.nes":$0E88F..$0EB21
+
+; Fix data from the import above
+; Unknown what this data is
+%org($8679,10)	; 0x28689
+	dw $3F01,$3F01,$3F01,$3F01,$3F01,$3F01
+	db $FF
+	dw $4001,$4001,$4001,$4001,$4001,$4001
+	db $FF
+	db $02,$19,$1B,$FF
+	db $02,$40,$01,$03,$48,$01,$03,$50,$03
+	db $02,$5F,$03,$02,$FF,$02,$A9,$21,$00
+	db $09,$21,$00,$A6,$20,$00,$06,$20,$00
+	db $07,$02,$02,$87,$02,$02,$56,$20,$00
+	db $59,$21,$00
+; Continue with the data fixes
+%org($86CB,10)	; 0x286DB
+	dw $6200
+	skip 14
+	db $C4,$0F,$03,$C8,$0F,$03,$D3,$10,$03
+	db $DB,$0A,$03,$E0,$0A,$03,$E8,$0A,$03
+	db $8F,$09,$03,$8D,$22,$01,$FF
+%org($8761,10)	; 0x28771
+	dw $8000
+%org($87D8,10)	; 0x287E8
+	dw $8C00
+%org($8807,10)	; 0x28817
+	dw $5E00
+%org($88BD,10)	; 0x288CD
+	dw $5E00
+%org($88DE,10)	; 0x288EE
+	dw $1809
+	skip 1
+	dw $1800
+	skip 1
+	dw $1900
+
+; Continue where we left off
+%org($890B,10)	; 0x2891B
+	db $07,$02,$02
+; Import data from 0x0EB22
+	incbin "rom/Metroid.nes":$0EB21..$0EC26
+	db $01,$6A,$FF
+
+; Fix data from the import above
+%org($892D,10)	; 0x2893D
+	dw $8000
+%org($898B,10)	; 0x2899B
+	dw $8000
+%org($89B4,10)	; 0x289C4
+	dw $8700
+
+; Blank out the rest of the bank
+%org($8A16,10)	; 0x28A26
+	%fillto($8000,11,$00)
+
+;-------------------------------------
+; 	Bank 11 ($2C000)
+;-------------------------------------
+
+%org($8000,11)	; 0x2C010
+; Copy over data from the original ROM starting at 0x12C42
+	incbin "rom/Metroid.nes":$12C42..$12D42
+
+; Fix the some bytes from the import above
+%org($8010,11)	; 0x2C020
+	dw $FFF2,$FFF2,$F3FF,$F3FF
+
+; Continue where we left off
+%org($8100,11)	; 0x2C110
+	db $A0,$A0,$A1,$A1,$A2,$A2,$A3,$A3
+	db $A4,$A4,$A5,$A5,$F4,$F5,$F4,$F5
+	db $F6,$F7,$F6,$F7,$A8,$A8,$A9,$A9
+	db $AA,$AA,$AB,$AB,$AC,$AC,$AD,$AD
+	db $F8,$F9,$FF,$FF,$FA,$FB,$FF,$FF
+	db $BB,$BB,$66,$66
+
+; New pointers for moved data
+; This is replaced by Saving v0.5.2!
+	dw $A26E,$A2A0,$A2DB,$A30D
+	dw $A351,$A39A,$A3FE,$A422
+	dw $A47E,$A4AA,$A4CD,$A4EB
+	dw $A519,$A559,$A58E
+
+; Copy over data from the original ROM starting at 0x122C7
+	incbin "rom/Metroid.nes":$122C7..$1257D
+
+; New pointers for moved data
+	dw $8452,$8465,$847E,$8497
+	dw $849E,$84A5,$84A9,$84B9
+	dw $84C9,$84CE,$84D3,$84D6
+	dw $84D9,$84E4,$84EA,$84EF
+	dw $84F8,$850D,$8510,$8523
+	dw $8538,$853C,$854F,$855C
+	dw $856F,$8582,$8597,$85A1
+	dw $85A4,$85AB,$85C7,$85D0
+	dw $85E5,$85E8,$85F1,$85F6
+	dw $85FB,$8605,$860E,$8619
+	dw $8626
+
+; Copy over data from the original ROM starting at 0x12A7B
+	incbin "rom/Metroid.nes":$12A7B..$12C42
+
+; Fix the some bytes from the import above
+%org($8497,11)	; 0x2C4A7
+	dw $4001,$4101,$4201
+	db $FF
+	dw $0701,$0701,$0701
+	db $FF
+
+; Continue where we left off
+%org($8619,11)	; 0x2C629
+	dw $4301,$4301,$4301,$4301,$4301,$4301
+	db $FF
+	dw $4401,$4401,$4401,$4401,$4401,$4401
+	db $FF
+
+; Copy over data from the original ROM starting at 0x122C7
+	incbin "rom/Metroid.nes":$122C7..$122D5
+
+	db $02,$A9,$28,$00,$A6,$27,$00,$06,$27
+	db $00,$09,$28,$00
+
+; Copy over data from the original ROM starting at 0x122C7
+	incbin "rom/Metroid.nes":$122D6..$122DC
+
+; Copy over data from the original ROM starting at 0x122C7
+	incbin "rom/Metroid.nes":$122D6..$12317
+
+; Fix the some bytes from the import above
+%org($8654,11)	; 0x2C664
+	dw $2756,$5900,$0028
+	skip 5
+	dw $1003,$0900
+
+; Continue where we left off
+%org($8695,11)	; 0x2C6A5
+	db $07,$02,$02
+
+; Copy over data from the original ROM starting at 0x122C7
+	incbin "rom/Metroid.nes":$12317..$12A19
+
+; Fix the some bytes from the import above
+%org($86AE,11)	; 0x2C6BE
+	dw $5F00
+	skip 1
+	dw $8000
+%org($86EE,11)	; 0x2C6FE
+	dw $5700
+	skip 4
+	dw $8000
+%org($8767,11)	; 0x2C777
+	dw $5900
+	skip 4
+	dw $8000
+%org($87A7,11)	; 0x2C7B7
+	dw $6200
+%org($8821,11)	; 0x2C831
+	dw $8B00
+%org($884D,11)	; 0x2C85D
+	dw $7200
+%org($88BA,11)	; 0x2C8CA
+	dw $5D00
+%org($88FB,11)	; 0x2C90B
+	dw $5E00
+%org($895C,11)	; 0x2C96C
+	dw $8C00
+%org($8975,11)	; 0x2C985
+	dw $8707
+
+; Continue where we left off
+%org($8D9C,11)	; 0x2CDAC
+; Copy over data from the original ROM starting at 0x122C7
+	incbin "rom/Metroid.nes":$12A4A..$12A7B
+
+; Fix the some bytes from the import above
+%org($8DAA,11)	; 0x2CDBA
+	dw $5E00
+
+; Blank out the rest of the bank
+%org($8DCD,11)	; 0x2CDDD
+	;%fillto($8000,12,$00)
 
 ;-------------------------------------
 ; 	Bank 12 ($30000)
@@ -1678,10 +2017,14 @@ l_1516A:		; 0x1517A
 %org($8D1F,12)	; 0x30D2F
 	db $00,$00,$00,$00,$00,$00,$00	; Blanked out in Mother
 %org($8D8D,12)	; 0x30D9D
-	db $00		; Blanked out in Mother
+	db $00
+
+; Blank out the rest of the bank and the entirety of bank 13 too
+%org($8D9E,12)	; 0x30DAE
+	%fillto($8000,14,$00)
 
 ;-------------------------------------
-; 	EDITROID data bank
+;EDITROID data bank (Bank 14, 0x38000)
 ;-------------------------------------
 
 ; Editroid ACSII string
@@ -1695,8 +2038,8 @@ l_1516A:		; 0x1517A
 	incbin "EditroidData.bin"
 
 ; DONE AUTOMATICALLY WITH ASAR'S EXPANSION METHOD, NOT NEEDED!!!
-;%org($99A8,14)	; 0x399B8
-	;%fillto($BFFD,13,$00)	; Fill with 00s
+%org($99A8,14)	; 0x399B8
+	%fillto($BFFD,13,$00)	; Fill with 00s
 
 %org($BFFE,14)	; 0x3C00E
 	dw l_C65A	; 5A C6 (?)
