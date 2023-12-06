@@ -1,0 +1,7 @@
+Pending things for Metroid Redux:
+
+	a) Fix the Missile explosion graphics
+	b) Modify the gravity so Samus falls faster (optional)
+	c) Modify Saving 0.5.2 so it properly shows all 8 Energy Tanks on the save file
+	d) Implement Samus' unused left sprites when walking and shooting
+	e) Test out the entire game with both Mother + Saving v0.5.2 and see if there's anything out of place
