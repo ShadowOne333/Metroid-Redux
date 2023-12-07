@@ -926,7 +926,8 @@ GameOver:
 	rts
 
 
-%org($8E1D,0)	; 0x00E2D
+%org($8E17,0)	; 0x00E27
+;%org($8E1D,0)	; 0x00E2D
 ; This was located at $8E17 originally for Saving v0.2
 ; Remove password scrambling
 PasswordChecksumAndScramble:

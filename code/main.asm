@@ -60,10 +60,10 @@ incbin "rom/Metroid.nes":$1C010..$20010
 ;		Main code
 ;----------------------------------------
 
-incsrc "code/gameplay/HideEnemiesInDoors.asm"
-incsrc "disassemblies/mother.asm"
+incsrc "code/gameplay/mother.asm"
 incsrc "code/gameplay/saving.asm"	; Missing Automap
 incsrc "code/gameplay/misc.asm"
+incsrc "code/gameplay/HideEnemiesInDoors.asm"
 
 ;----------------------------------------
 ;		Messages/Text

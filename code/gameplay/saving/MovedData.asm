@@ -67,7 +67,7 @@ l_A58E:
 
 ; Pointers to Kraid's room definitions at 0x12XXX
 %org($8124,11)	; 0x2C134
-	dw $A1A2,$A1DE,$A210,$A234
+	dw l_A1A2,$A1DE,$A210,$A234
 	dw $A26E,$A2A0,$A2DB,$A30D
 	dw $A351,$A39A,$A3FE,$A422
 	dw $A47E,$A4AA,$A4CD,$A4EB

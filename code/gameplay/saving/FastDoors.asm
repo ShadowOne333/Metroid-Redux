@@ -8,12 +8,13 @@
 
 ; Fix palette loading from Fast Doors
 %org($C92B,15)	; $3C93B
-	jsr Section4	; Originally JSR $E1F1, changed to new code for Fast Doors which fixes wrong palette loading
+	jsr ScrollDoor
+	;jsr Section4	; Originally JSR $E1F1, changed to new code for Fast Doors which fixes wrong palette loading
 
 ; Overwrite NARPASSWORD subroutine from the main Game Engine section
 %org($C931,15)	; 0x3C941
-	jsr $E1F1
-	jsr $E1F1
+	jsr ScrollDoor
+	jsr ScrollDoor
 	nop #14
 l_C945:
 
@@ -29,7 +30,7 @@ l_C945:
 %org($FFD5,15)	; 0x3FFE5, Bank $0F
 Section4:	;FFD5 - FFF9
 CheckMinHealth:
-	lda HealthHigh	; Exit if health (including full tanks) >= 30, supposed to be $6877 (TankCount) but it's $0107 in the source code
+	lda TankCount	; Exit if health (including full tanks) >= 30, supposed to be $6877 (TankCount) but it's $0107 (HealthHigh?) in the source code for some reason
 	jsr Amul16	; cmp #$03
 	ora #$09	;
 	;bcs +

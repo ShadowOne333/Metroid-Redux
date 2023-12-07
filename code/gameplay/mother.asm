@@ -855,7 +855,7 @@ l_9C64:
 	dw $A42C,$8400,$8000
 	dw $8D60,$8E60,$8E74
 	
-	nop	; Clear leftover byte from original LDA $06
+	; Clear leftover byte from original LDA $06
 
 
 %org($A357,3)	; 0x0E367
@@ -1593,6 +1593,8 @@ l_1516A:		; 0x1517A
 ; 	Bank 9 ($24000)
 ;-------------------------------------
 
+; Brinstar data (?)
+
 %org($8000,9)	; 0x24010
 ; Import data from 0x0AEFC
 	incbin "rom/Metroid.nes":$0AEFC..$0B000
@@ -2273,6 +2275,7 @@ l_C6A0:
 	jsr MMCWriteReg3
 +	pla
 	rts
+
 	pla
 	and #$0F
 	tax

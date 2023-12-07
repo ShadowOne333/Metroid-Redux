@@ -145,10 +145,11 @@ warnpc $B1F0
 ;   Make doors have unique tiles
 ;-------------------------------------
 %org($E807,15)	; $3E817
-	; C9 A0 F0 06 C9 A1 D0 04
-	cmp #$A0
-	bcc $06
+; This code loads tiles A0->A7
+;	cmp #$A0 : bcc $06 : cmp #$A7 : bcs $04
 	cmp #$A7
+	bcc $06
+	cmp #$AF
 	bcs $04
 
 ; C9 (A0 + normal doorway tiles) 90 06 C9 (A0 + normal doorway tiles + horizontal doorway tiles) B0 04

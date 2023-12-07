@@ -92,6 +92,7 @@ SamusGear	= $6878	; Bit field specifying which of 8 items samus has
 MissileCount	= $6879	; Number of missiles player has.
 MaxMissiles	= $687A	; Maximum number of missiles player can carry
 PasswordBytes	= $6988	; Un-encoded password data
+PasswordByte11	= $6999	; Stores sum of $6988 thru $6998 (Checksum)
 BankLock	= $6FF0
 RoomDataBanked	= $6FF1
 
@@ -156,7 +157,7 @@ SamusBlipTile		= $BF
 UpdateSparkleSprites	= $87CF
 CalculatePassword	= $8C7A	; Calculates the password
 PasswordChecksum	= $8E21	; Store combined added value of -->
-PasswordByte11		= $8E2D	; addresses $6988 thu $6998 in $6999.
+;PasswordByte11		= $8E2D	; addresses $6988 thu $6998 in $6999.
 ClearAll		= $909F	; Turn off screen, erase sprites and nametables
 PreparePPUProcess	= $9449	; Clears screen and writes "START CONTINUE".
 PreparePPUProcess_	= $C20E
@@ -172,6 +173,7 @@ DisplayBar		= $E0C1
 CheckMoveLeft		= $E880
 CheckMoveRight		= $E88B
 HexToDec		= $E198
+ScrollDoor		= $E1F1	; Scrolls the screen if Samus is inside a door
 Reset			= $FFB0
 
 ; Map data and its RAM
