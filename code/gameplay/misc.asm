@@ -145,8 +145,9 @@ warnpc $B1F0
 ;   Make doors have unique tiles
 ;-------------------------------------
 %org($E807,15)	; $3E817
-; This code loads tiles A0->A7
+; This code loads tiles A0->A7, original code:
 ;	cmp #$A0 : bcc $06 : cmp #$A7 : bcs $04
+; Modified to the following for Mother
 	cmp #$A7
 	bcc $06
 	cmp #$AF

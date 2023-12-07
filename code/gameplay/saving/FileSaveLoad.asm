@@ -1030,11 +1030,11 @@ FileScreenStrings:
 	;Writes row $2660 (20th row from top).
 	;db $26,$69,$12	; PPU address and length
 	;db "              M510"
-	
+
 
 	db $2E,$85,$07	; PPU Address and length
 	db "-EMPTY-"
-	
+
 	db $00		; End PPU string write.
 
 EndFileScreenStrings:
