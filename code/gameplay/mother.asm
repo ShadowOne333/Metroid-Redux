@@ -278,31 +278,45 @@ incsrc "code/text/Text.tbl"
 %org($8AA1,1)	; 0x04AB1
 l_8AA1:
 	db $1E,$00,$08
-	db $F5,$F6,$F7,$FA,$FB,$FC
-	db $08,$04,$C5,$C6,$C7
-	db $D5,$D6,$D7,$E5,$E6,$E7,$FF
+	db $F5,$F6,$F7
+	db $FA,$FB,$FC
+	db $00,$04	; Position bytes (Y, X)
+	db $C5,$C6,$C7
+	db $D5,$D6,$D7
+	db $E5,$E6,$E7
+	db $FF	; End
 
 ; Rewrite Kraid Statue sprite entry
 l_8AB6:
 	db $1E,$00,$08
-	db $F5,$F6,$F7,$FA,$FB,$FC
-	db $08,$04,$C5,$C6,$C7
+	db $F8,$F9,$FE
+	db $FA,$FB,$FC
+	db $00,$04	; Position bytes (Y, X)
+	db $C8,$C9,$FE
 l_8AC4:
-	db $D5,$D6,$D7,$E5,$E6,$E7,$FF
+	db $D8,$D9,$EA
+	db $E8,$E9,$EB
+	db $FF	; End
 
 ; Rewrite Ridley Statue sprite entry
-
-	db $1E,$00
+	db $EB,$FF
 l_8ACD:
-	db $08
-	db $F8,$F9,$FE,$FA,$FB,$FC
-	db $00,$04,$C8,$C9,$FE
-	db $D8,$D9,$EA,$E8,$E9,$EB,$FF
-	db $EB,$FF,$00,$F4,$00,$FC
-	db $00,$04,$08,$F8,$08,$00
-	db $E8,$F0,$E8,$F8,$E8,$00
-	db $F0,$F0,$F0,$F8,$F0,$00
-	db $F8,$F0,$F8,$F8,$F8,$00
+	db $00,$F4
+	db $00,$FC,$00,$04,$08,$F8,$08,$00
+	db $E8,$F0,$E8,$F8,$E8,$00,$F0,$F0
+	db $F0,$F8,$F0,$00,$F8,$F0,$F8,$F8
+	db $F8,$00
+	;db $1E,$00
+
+	;db $08
+	;db $F8,$F9,$FE,$FA,$FB,$FC
+	;db $00,$04,$C8,$C9,$FE
+	;db $D8,$D9,$EA,$E8,$E9,$EB,$FF
+	;db $EB,$FF,$00,$F4,$00,$FC
+	;db $00,$04,$08,$F8,$08,$00
+	;db $E8,$F0,$E8,$F8,$E8,$00
+	;db $F0,$F0,$F0,$F8,$F0,$00
+	;db $F8,$F0,$F8,$F8,$F8,$00
 
 ;-------------------------------------
 ; Graphics data, partial font "THE END"
