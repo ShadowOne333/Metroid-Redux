@@ -13,6 +13,7 @@
 
 %org($E153,15)	; 0x3E163
 	lda #$18	; X position of first HUD E-Tank sprite
+			; Could be #$50 too?
 %org($E17B,15)	; 0x3E18B
 	lda #$17	; Y position of HUD E-Tank sprites
 
