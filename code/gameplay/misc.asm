@@ -140,8 +140,7 @@ warnpc $B1F0
 ;-------------------------------------
 %org($DC03,15)	; $3DC13
 ; Change max tanks from $06 to $08 to accommodate for the extra 2 tanks you can get in the game
-	cmp #$07
-	;cmp #$08
+	cmp #$08
 
 ; NOTE: THIS NEEDS A FIX SO THAT OBTAINING ALL 8 ENERGY TANKS DOESN'T SCREW UP THE FILE BELOW IN THE FILE SELECT OPTION
 

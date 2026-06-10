@@ -228,20 +228,22 @@ BlankTanks:
 	sta SaveFiles.localVar
 
 	ldy SaveFiles.localVar2		; Get PPU address of tanks
-	lda TankPPUAddresses+1,y		; PPU dest high
+	lda TankPPUAddresses+1,y	; PPU dest high
 	sta SmallStringRam
 	lda TankPPUAddresses,y	; PPU dest low
 	clc
-	adc SaveFiles.localVar		; + tank count (leave this many tanks)
+	adc SaveFiles.localVar	; + tank count (leave this many tanks)
 	sta SmallStringRam+1
 
-	lda #$48		; 8 tiles, RLE
-	sec
-	sbc SaveFiles.localVar		; - tank count
-	sta SmallStringRam+2
-
+	; Flipped with the paragraph after it to fix the save files showing 8 Energy tanks
 	lda #$FF		; FF = blank tiles
 	sta SmallStringRam+3
+
+	; Flipped with the paragraph before it to fix the save files showing 8 Energy tanks
+	lda #$48		; 8 tiles, RLE
+	sec
+	sbc SaveFiles.localVar	; - tank count
+	sta SmallStringRam+2
 
 	cmp #$40		; If player has 8 tanks, there is nothing to blank out. Move on to next thing.
 	beq DontBlankTanks
