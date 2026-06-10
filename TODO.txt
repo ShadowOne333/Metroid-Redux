@@ -1,8 +1,7 @@
 Pending things for Metroid Redux:
 
-	* Fix the Missile explosion graphics (FIXED IN BANK 1, $4AB1)
-	* Modify the gravity so Samus falls faster (optional)
-	* Modify Saving 0.5.2 so it properly shows all 8 Energy Tanks on the save file
+	* (DONE) Fix the Missile explosion graphics (FIXED IN BANK 1, $4AB1)
+	* (DONE) Modify Saving 0.5.2 so it properly shows all 8 Energy Tanks on the save file
 	* Re-add the Mission Briefing when timing out on the title screen to work with Saving 0.5.2
 	* Implement Samus' unused left sprites when walking and shooting
 	* Modify Samus' Power Suit palette to closely match her proper Power Suit color scheme
@@ -12,7 +11,6 @@ Pending things for Metroid Redux:
 	* Modify Samus' Morph Ball sprites to closely match the official design
 	* Add Spring Ball when obtaining Hi Jump
 	* Add Automap (?)
-	* 
+	* Modify the gravity so Samus falls faster (optional)
 
-
-	* Test out the entire game with both Mother + Saving v0.5.2 and see if there's anything out of place
+	* Test out the entire game with both Metroid + Saving v0.5.2 and see if there's anything out of place
